@@ -1,5 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config();
+require('./telegram/telegram');
 
 const app = express();
 
@@ -22,4 +25,19 @@ app.get('*', (req, res) => {
 
 //**************************
 
-app.listen(PORT, () => console.log(`App has been started on port ${PORT}...`));
+async function startApp() {
+    try {
+        // mongoDB connection
+        await mongoose.connect(process.env.MONGO_URL, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+
+        const server = app.listen(PORT, () => console.log(`App has been started on port ${PORT}...`))
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+startApp()

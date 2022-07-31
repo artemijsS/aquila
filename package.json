@@ -18,9 +18,13 @@
   },
   "homepage": "https://github.com/artemijsS/aquila#readme",
   "dependencies": {
+    "axios": "^0.27.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "keycloak-verify": "^0.4.0",
+    "mongoose": "^6.5.0",
+    "node-telegram-bot-api": "^0.58.0",
     "nodemon": "^2.0.19"
   }
 }
