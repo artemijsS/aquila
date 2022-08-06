@@ -12,6 +12,12 @@ app.use(express.json({ extended: true }));
 
 const PORT = process.env.PORT || 5000;
 
+// registration, login
+app.use('/api/auth', require('./routes/auth.routes'));
+
+// signals
+app.use('/api/signal', require('./routes/signal.routes'));
+
 //**************************
 //  REACT APP
 //**************************
