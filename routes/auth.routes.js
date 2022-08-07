@@ -61,59 +61,44 @@ router.post('/register',
 // api/auth/login
 router.post('/login',
     [
-        check('email', 'Incorrect email').isEmail(),
-        check('password', 'Minimal length - 6 symbols').isLength({ min: 6 })
+        check('telegram_username', 'Incorrect username').notEmpty(),
+        check('password', 'Incorrect password').notEmpty()
     ],
     async (req, res) => {
 
         try {
-            const errors = validationResult(req)
-
-            const language = req.body.language
-            let msg
-            if (language === "LV")
-                msg = "Ir ievadīte nepareizi dati"
-            else if (language === "RU")
-                msg = "Введены неправильные данные"
-            else
-                msg = "Incorrect data on login"
+            const errors = validationResult(req);
 
             if (!errors.isEmpty()) {
                 return res.status(400).json({
                     errors: errors.array(),
-                    message: msg
+                    message: "Validation issue"
                 })
             }
 
-            const {email, password} = req.body
+            const {telegram_username, password} = req.body;
 
-            const user = await User.findOne({ email })
+            const user = await User.findOne({ telegram_username });
 
             if (!user) {
-                if (language === "LV")
-                    msg = "Lietotājs nav atrasts"
-                else if (language === "RU")
-                    msg = "Пользователь не найден"
-                else
-                    msg = "User not found"
-                return res.status(400).json({ message: msg })
+                return res.status(400).json({ data: { message: "User not found" }})
             }
 
             const isMatch = await bcrypt.compare(password, user.password)
 
             if (!isMatch)
-                return res.status(400).json({ message: msg})
+                return res.status(400).json({ data: { message: "Incorrect password" }})
 
-            user.status = true
+            user.last_time_seen = new Date().toJSON();
             await user.save()
 
             const token = jwt.sign(
                 { userId: user.id, role: user.role },
-                config.get('jwtSecret'),
+                process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
 
-            res.json({ token, name: user.name, email: user.email, userId: user.id, telephone: user.telephone, role: user.role, description: user.description, photo: user.photo, language: user.language })
+            res.json({ token })
 
         } catch (e) {
             res.status(500).json({ message: "Error" })
@@ -139,6 +124,26 @@ router.get('/check', async (req, res) => {
         }
 
         res.json({ name: user.name, email: user.email, userId: user.id, telephone: user.telephone, role: user.role, description: user.description, photo: user.photo, language: user.language })
+    } catch (e) {
+        res.status(500).json({ message: "Error" })
+    }
+})
+
+// api/auth/checkUserRegister
+router.post('/checkUserRegister', [
+        check('telegram_username', 'telegram_username is necessary').notEmpty()
+    ], async (req, res) => {
+
+    try {
+
+        const {telegram_username} = req.body;
+        const user = await User.findOne({ telegram_username });
+
+        if (!user) {
+            return res.json(false);
+        }
+
+        res.json(true);
     } catch (e) {
         res.status(500).json({ message: "Error" })
     }
