@@ -20,7 +20,7 @@ bot.onText(/\/start/, (msg) => {
                 bot.onReplyToMessage(telegram_chatId, msg_id, msg => {
                     const password = msg.text;
 
-                    axios.post('http://localhost:5000/api/auth/register', {
+                    axios.post(process.env.SERVER_DEV + '/api/auth/register', {
                         telegram_username,
                         password,
                         telegram_chatId,
@@ -50,7 +50,7 @@ bot.onText(/\/login/, (msg) => {
         bot.onReplyToMessage(telegram_chatId, msg_id, msg => {
             const password = msg.text;
 
-            axios.post('http://localhost:5000/api/auth/login', {
+            axios.post(process.env.SERVER_DEV + '/api/auth/login', {
                 telegram_username,
                 password
             }).then(res => {
