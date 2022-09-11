@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const checkRegistration = async (telegram_chatId, telegram_username) => {
-    return await axios.post(process.env.SERVER_DEV + '/api/auth/checkUserRegister', {telegram_username}).then(res => res.data).catch(err => {
+    return await axios.post('http://localhost:' + process.env.PORT + '/api/auth/checkUserRegister', {telegram_username}).then(res => res.data).catch(err => {
         console.log(err);
         return false;
     });
