@@ -5,7 +5,8 @@ const schema = new Schema({
     password: {type: String, required: true},
     telegram_chatId: {type: String, required: true},
     role: {type: String, required: true},
-    BINANCE_API: {type: String},
+    BINANCE_API_KEY: {type: String},
+    BINANCE_API_SECRET: {type: String},
     description: {type: String},
     last_time_seen: {type: String}
 })

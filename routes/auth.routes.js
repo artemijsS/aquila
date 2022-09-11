@@ -55,7 +55,6 @@ router.post('/register',
         } catch (e) {
             res.status(500).json({ data: { message: "Error" }})
         }
-
     })
 
 // api/auth/login
@@ -122,6 +121,9 @@ router.get('/check', async (req, res) => {
         if (!user) {
             return res.status(401).json({message: 'No auth'})
         }
+
+        user.last_time_seen = new Date().toJSON();
+        await user.save()
 
         res.json({ name: user.name, email: user.email, userId: user.id, telephone: user.telephone, role: user.role, description: user.description, photo: user.photo, language: user.language })
     } catch (e) {
