@@ -5,9 +5,137 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5;
+  color: rgba(0, 0, 0, 0.87);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/*                LOGIN*/
+.login-screen {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 300px;
+}
+
+.login {
+  position: relative;
+  width: 30%;
+  min-width: 300px;
+  height: 40%;
+  min-height: 300px;
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+
+.login-logo {
+  width: 300px;
+  position: absolute;
+  top: -70%;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+@media screen and (max-height: 950px) {
+  .login-logo {
+    width: 200px;
+    top: -65%;
+  }
+}
+
+.formLogin {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 90%;
+}
+.formLogin .inputs {
+  width: 80%;
+}
+
+.form__group {
+  position: relative;
+  padding: 15px 0 0;
+  margin-bottom: 10px;
+}
+
+.form__field {
+  font-family: inherit;
+  width: 100%;
+  border: 0;
+  border-bottom: 2px solid #9b9b9b;
+  outline: 0;
+  font-size: 1.3rem;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 7px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+}
+.form__field::placeholder {
+  color: transparent;
+}
+.form__field:placeholder-shown ~ .form__label {
+  font-size: 1.3rem;
+  cursor: text;
+  top: 20px;
+}
+
+.form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #9b9b9b;
+}
+
+.form__field:focus {
+  padding-bottom: 6px;
+  font-weight: 700;
+  border-width: 3px;
+  border-image: linear-gradient(to right, #000000, #ffffff);
+  border-image-slice: 1;
+}
+.form__field:focus ~ .form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.87);
+  font-weight: 700;
+}
+
+/* reset input */
+.form__field:required, .form__field:invalid {
+  box-shadow: none;
+}
+
+.formLogin button {
+
+}
+
+
+
+
+/*                  MAIN*/
+button {
+  font-size: 1.2rem;
+  padding: 8px 25px;
+  background-color: #f0f2f5;
+  border: none;
+  border-radius: 10px;
+  color: rgba(0, 0, 0, 0.87);
+}
+button:hover {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.87);
+  color: #f0f2f5;
 }
