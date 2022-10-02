@@ -126,6 +126,63 @@ code {
 
 
 /*                  MAIN*/
+.wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.navigation {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  border-right: 1px solid #9b9b9b;
+  align-items: center;
+  font-size: 25px;
+  padding-top: 20px;
+  background-color: #9b9b9b;
+  color: white;
+}
+
+@media screen and (max-width: 970px) {
+  .navigation {
+    width: 150px;
+  }
+}
+@media screen and (max-width: 600px) {
+  .navigation {
+    display: none;
+  }
+}
+
+.navigation .username {
+  margin-bottom: 70px;
+  font-size: 1.3em;
+}
+.navigation .menu {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+.navigation .menu .link {
+  padding: 12px 7px;
+  /*border-bottom: 1px solid #9b9b9b;*/
+  /*border-top: 1px solid #9b9b9b;*/
+}
+.link + .link {
+  border-top: 1px solid #9b9b9b;
+}
+.link.active {
+  border-bottom: 1px solid white;
+}
+.navigation .menu .down {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+
 button {
   font-size: 1.2rem;
   padding: 8px 25px;
@@ -138,4 +195,39 @@ button:hover {
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.87);
   color: #f0f2f5;
+}
+
+/*                  LOADER*/
+.loader {
+  border: 12px solid #f3f3f3; /* Light grey */
+  border-top: 12px solid black; /* Blue */
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/*                  OTHER STUFF*/
+.flex {
+  display: flex;
+}
+
+.jus-con-cen {
+  justify-content: center;
+}
+
+.al-it-cen {
+  align-items: center;
+}
+
+.full-screen {
+  width: 100vw;
+  height: 100vh;
+  min-width: 300px;
+  min-height: 300px;
 }
