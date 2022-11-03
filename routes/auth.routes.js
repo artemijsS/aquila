@@ -100,7 +100,7 @@ router.post('/login',
             const username = user.telegram_username;
             const role = user.role;
 
-            res.json({ token, username, role })
+            res.json({ token, username, role, telegram_chatId: user.telegram_chatId })
 
         } catch (e) {
             res.status(500).json({ message: "Error" })
@@ -117,7 +117,7 @@ router.get('/check', async (req, res) => {
             return res.status(401).json({message: 'No auth'})
         }
 
-        const userId = jwt.verify(token, config.get('jwtSecret'))
+        const userId = jwt.verify(token, process.env.JWT_SECRET)
 
         const user = await User.findById(userId.userId)
 
@@ -128,7 +128,7 @@ router.get('/check', async (req, res) => {
         user.last_time_seen = new Date().toJSON();
         await user.save()
 
-        res.json({ username: user.telegram_username, role: user.role })
+        res.json({ username: user.telegram_username, role: user.role, telegram_chatId: user.telegram_chatId })
     } catch (e) {
         res.status(500).json({ message: "Error" })
     }

@@ -17,10 +17,10 @@ export const userDataFetch = (obj, path) => {
                     return data.message
                 } else {
                     localStorage.setItem("token", data.token)
-                    localStorage.setItem("language", data.language)
                     const user = {
-                        telegram_username: data.telegram_username,
-                        telegram_chatId: data.telegram_chatId
+                        telegram_username: data.username,
+                        telegram_chatId: data.telegram_chatId,
+                        role: data.role
                     }
                     dispatch(loginUser(user))
                     dispatch(setUserLoading(false))
@@ -47,10 +47,12 @@ export const getProfileFetch = () => {
                     if (data.message) {
                         console.log(data.message)
                         localStorage.removeItem("token")
+                        dispatch(setUserLoading(false))
                     } else {
                         const user = {
-                            telegram_username: data.telegram_username,
-                            telegram_chatId: data.telegram_chatId
+                            telegram_username: data.username,
+                            telegram_chatId: data.telegram_chatId,
+                            role: data.role
                         }
                         dispatch(loginUser(user))
                         dispatch(setUserLoading(false))
