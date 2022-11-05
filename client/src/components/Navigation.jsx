@@ -1,8 +1,15 @@
 import React from 'react'
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import {logoutUser} from "../redux/actions/user";
 
 function Navigation () {
+    const dispatch = useDispatch();
+
     const { userData } = useSelector(({ user }) => user);
+
+    const logOut = () => {
+        dispatch(logoutUser())
+    }
 
     return (
         <div className="navigation">
@@ -33,6 +40,10 @@ function Navigation () {
                             <div>Admin</div>
                         </div>
                     }
+                    <div className="link" onClick={logOut}>
+                        <svg width="30" height="30" viewBox="0 0 428 480" xmlns="http://www.w3.org/2000/svg" ><title>cancel</title><path d="M90 390l120-120 130 120 30-30-130-120 130-120-30-30-130 120-120-120-30 30 120 120-120 120 30 30z" /></svg>
+                        <div>Exit</div>
+                    </div>
                 </div>
             </div>
         </div>
