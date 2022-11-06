@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import NavCom from './nav-com'
 import {useSelector} from "react-redux";
 
@@ -17,7 +17,7 @@ function Navigation ({activeRoute}) {
                     <span className="line line3"/>
                 </div>
                 <div className="menu-mobile">
-                    <NavCom activeRoute={activeRoute} userData={userData}/>
+                    <NavCom activeRoute={activeRoute}/>
                 </div>
             </div>
             <div className="navigation">

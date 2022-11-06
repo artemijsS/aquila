@@ -1,12 +1,14 @@
-import React from 'react'
-import { useDispatch } from "react-redux";
+import React, {useEffect} from 'react'
+import {useDispatch, useSelector} from "react-redux";
 import { logoutUser } from "../../redux/actions/user";
 import { Link } from "react-router-dom";
 import { toast } from 'react-toastify';
 
 
-function NavCom ({activeRoute, userData}) {
+function NavCom ({activeRoute}) {
     const dispatch = useDispatch();
+
+    const { userData } = useSelector(({ user }) => user);
 
     const logOut = () => {
         toast.success("Have a good day!")
@@ -34,6 +36,7 @@ function NavCom ({activeRoute, userData}) {
                 </Link>
                 {userData.role === "admin" &&
                 <Link to="/admin" className={activeRoute === "admin" ? "active link" : "link"}>
+                    <svg width="30" height="30" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" ><title>edit</title><path d="M200 360l150-150-80-80-150 150 80 80z m-140 60l110-30-80-80-30 110z m240-320l80 80 50-50-80-80-50 50z" /></svg>
                     <div>Admin</div>
                 </Link>
                 }
