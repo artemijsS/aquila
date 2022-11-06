@@ -14,6 +14,7 @@ export const userDataFetch = (obj, path) => {
             .then(resp => resp.json())
             .then(data => {
                 if (data.message) {
+                    dispatch(setUserLoading(false))
                     return data.message
                 } else {
                     localStorage.setItem("token", data.token)

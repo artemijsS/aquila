@@ -3,12 +3,13 @@ import { Helmet } from 'react-helmet';
 import { useDispatch } from "react-redux";
 import { userDataFetch } from "../redux/actions/user";
 import logo from '../assets/logo.png';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AuthPage () {
 
     const dispatch = useDispatch()
 
-    const [loading, setLoading] = useState(false)
     const [form, setForm] = useState({
         telegram_username: '', password: ''
     })
@@ -19,10 +20,11 @@ function AuthPage () {
 
     const submit = event => {
         event.preventDefault()
-        setLoading(true)
         dispatch(userDataFetch(form,'login')).then(res => {
             if (res) {
-                setLoading(false)
+                toast.error('Incorrect data, try one more time');
+            } else {
+                toast.success('Hello =)')
             }
         })
     }
@@ -36,12 +38,7 @@ function AuthPage () {
                 <div className="login">
                     <img className="login-logo" src={logo} alt="logo"/>
                     <form className="formLogin" onSubmit={submit}>
-                        {loading
-                            ?
-                            <h1>Loading...</h1>
-                            :
-                            <h1>Login</h1>
-                        }
+                        <h1>Login</h1>
                         <div className="inputs">
                             <div className="form__group field">
                                 <input className="form__field" placeholder="Telegram username" type="text" id="telegram_username" name="telegram_username" required onChange={changeHandler}/>

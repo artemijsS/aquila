@@ -80,13 +80,13 @@ router.post('/login',
             const user = await User.findOne({ telegram_username });
 
             if (!user) {
-                return res.status(400).json({ data: { message: "User not found" }})
+                return res.status(400).json({ message: "User not found" })
             }
 
             const isMatch = await bcrypt.compare(password, user.password)
 
             if (!isMatch)
-                return res.status(400).json({ data: { message: "Incorrect password" }})
+                return res.status(400).json({ message: "Incorrect data" })
 
             user.last_time_seen = new Date().toJSON();
             await user.save()
