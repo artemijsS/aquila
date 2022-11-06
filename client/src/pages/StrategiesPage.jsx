@@ -1,13 +1,13 @@
 import React from 'react'
 import { Navigation } from '../components'
 
-function MainPage () {
+function StrategiesPage () {
 
 
     return (
         <div>
             <div className="wrapper full-screen">
-                <Navigation/>
+                <Navigation activeRoute="strategies"/>
                 <div className="main-window">
 
                 </div>
@@ -16,5 +16,5 @@ function MainPage () {
     )
 }
 
-export default MainPage;
+export default StrategiesPage;
 
