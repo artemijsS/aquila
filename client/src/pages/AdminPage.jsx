@@ -1,6 +1,6 @@
 import React from 'react'
-import {Helmet} from "react-helmet";
-import {Navigation} from "../components";
+import { Helmet } from "react-helmet";
+import { Navigation } from "../components";
 
 function AdminPage () {
 

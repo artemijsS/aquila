@@ -1,6 +1,6 @@
 import React from 'react'
 import { Navigation } from '../components'
-import {Helmet} from "react-helmet";
+import { Helmet } from "react-helmet";
 
 function StrategiesPage () {
 
