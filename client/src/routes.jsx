@@ -1,13 +1,21 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useSelector } from "react-redux";
 import { LoadingPage, OverviewPage, AdminPage, AuthPage, SettingsPage, SignalsPage, StrategiesPage } from "./pages";
 
 
-export const useRoutes = () => {
+export const useRoutes = (urlPath) => {
 
     const { userData } = useSelector(({ user }) => user);
     const { userLoading } = useSelector(({ loading }) => loading);
+
+    const [url, setUrl] = useState(urlPath)
+
+    useEffect(() => {
+        if (!pages.includes(urlPath)) {
+            setUrl("/overview")
+        }
+    }, [])
 
     if (userLoading) {
         return (
@@ -28,7 +36,7 @@ export const useRoutes = () => {
                         userData.role === "admin" &&
                         <Route path="/admin" element={ <AdminPage/> }/>
                     }
-                    <Route path="*" element={<Navigate to ="/overview" />}/>
+                    <Route path="*" element={<Navigate to ={url} />}/>
                 </Routes>
             )
         } else {
@@ -41,3 +49,5 @@ export const useRoutes = () => {
         }
     }
 }
+
+const pages = ["/overview", "/strategies", "/signals", "/settings", "/admin"]

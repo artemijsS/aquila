@@ -3,15 +3,17 @@ import { useDispatch } from "react-redux";
 import { BrowserRouter } from 'react-router-dom';
 import { useRoutes } from "./routes";
 import { getProfileFetch } from "./redux/actions/user";
-import {ToastContainer} from "react-toastify";
+import { ToastContainer } from "react-toastify";
 
 
-function App() {
-  const routes = useRoutes()
+function App({ urlPath }) {
+  const routes = useRoutes(urlPath)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(getProfileFetch())
+      dispatch(getProfileFetch())?.then(() => {
+          console.log(1)
+      })
   }, [])
 
   return (
