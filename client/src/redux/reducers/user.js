@@ -14,6 +14,14 @@ const user = (state = initialState, action) => {
                 ...state,
                 userData: {}
             }
+        case 'USER_2FA':
+            return {
+                ...state,
+                userData: {
+                    ...state.userData,
+                    _2FA: action.payload
+                }
+            }
         default:
             return state
     }

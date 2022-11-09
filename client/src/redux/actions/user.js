@@ -15,8 +15,14 @@ export const userDataFetch = (obj, path) => {
             .then(data => {
                 if (data.message) {
                     dispatch(setUserLoading(false))
-                    return data.message
+                    return "error"
                 } else {
+                    if (data.twoFA) {
+                        console.log("2FA")
+                        dispatch(setUserLoading(false))
+                        dispatch(set2FA(true))
+                        return "2FA"
+                    }
                     localStorage.setItem("token", data.token)
                     const user = {
                         telegram_username: data.username,
@@ -81,4 +87,9 @@ export const logout = () => {
 const loginUser = obj => ({
     type: 'USER_LOGIN',
     payload: obj
+})
+
+const set2FA = bool => ({
+    type: 'USER_2FA',
+    payload: bool
 })

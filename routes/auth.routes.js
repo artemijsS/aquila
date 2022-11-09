@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { check, validationResult } = require('express-validator')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { bot } = require('../telegram/telegram')
 
 const User = require('../models/User');
 
@@ -87,6 +88,10 @@ router.post('/login',
 
             if (!isMatch)
                 return res.status(400).json({ message: "Incorrect data" })
+
+            if (user.twoFAuthentication) {
+                return res.json({ twoFA: true })
+            }
 
             user.last_time_seen = new Date().toJSON();
             await user.save()

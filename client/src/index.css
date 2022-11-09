@@ -31,10 +31,16 @@ code {
   width: 30%;
   min-width: 300px;
   height: 40%;
-  min-height: 300px;
+  min-height: 400px;
   background-color: white;
   border-radius: 0.75rem;
   box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+
+@media screen and (max-width: 1300px) {
+  .login {
+    width: 80%;
+  }
 }
 
 .login-logo {
@@ -368,4 +374,14 @@ button:hover {
   height: 100vh;
   min-width: 300px;
   min-height: 300px;
+}
+
+button[disabled] {
+  /*background-color: #4776e6;*/
+  user-select: none;
+  pointer-events: none;
+  cursor: not-allowed !important;
+  -moz-opacity: 0.3;
+  -khtml-opacity: 0.3;
+  opacity: 0.3;
 }

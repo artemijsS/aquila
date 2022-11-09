@@ -1,0 +1,193 @@
+.container {
+    display: block;
+    width: 320px;
+    margin: 0 auto;
+    padding-top: 30px;
+}
+.container h1 {
+    position: relative;
+    display: inline-block;
+    color: #000;
+    font-size: 2em;
+    font-weight: 400;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0 0 20px;
+    padding: 0;
+}
+.container h1:after {
+    display: block;
+    background: #000;
+    content: '';
+    height: 3px;
+    width: 50%;
+    margin: 20px auto 0;
+    padding: 0;
+}
+.form {
+    display: block;
+}
+.form__group {
+    margin: 10px 0 0;
+}
+.form__group--error.form__pincode > input {
+    background-color: #eb3b3b;
+}
+.form__group--error.form__pincode > input[disabled] {
+    background-color: #eb3b3b;
+    color: #fff;
+    opacity: 1;
+}
+.form__group--success.form__pincode > input {
+    background-color: #32c832;
+}
+.form__group--success.form__pincode > input[disabled] {
+    background-color: #32c832;
+    color: #fff;
+    opacity: 1;
+}
+.form__pincode {
+    display: block;
+    width: 100%;
+    margin: 10px auto 20px;
+    padding: 0;
+}
+.form__pincode:before,
+.form__pincode:after {
+    display: table;
+    content: '';
+}
+.form__pincode:after {
+    clear: both;
+}
+.form__pincode > label {
+    display: block;
+    text-align: center;
+    margin: 10px 0;
+}
+.form__pincode > input[type="number"] {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    margin-left: 50px;
+}
+.form__pincode > input {
+    display: inline-block;
+    float: left;
+    width: 15%;
+    height: 50px;
+    line-height: 48px;
+    text-align: center;
+    font-size: 2em;
+    color: #181819;
+    border: 0;
+    border-bottom: 2px solid rgba(0,0,0,0.3);
+    border-radius: 2px 2px 0 0;
+    transition: background-color 0.3s, color 0.3s, opacity 0.3s;
+    cursor: default;
+    user-select: none;
+    margin: 0;
+    margin-top: 10px;
+    margin-right: 2%;
+    padding: 0;
+}
+.form__pincode > input:focus {
+    outline: 0;
+    box-shadow: none;
+    border-color: #1486f0;
+    animation: border-pulsate 1.5s infinite;
+    -webkit-tap-highlight-color: transparent;
+}
+.form__pincode > input:last-child {
+    margin-right: 0;
+}
+.form__pincode > input[disabled] {
+    background: #eee;
+    opacity: 1;
+}
+.form__buttons {
+    text-align: center;
+    margin: 0 auto;
+    padding: 10px 0 0;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Placeholder
+   ============================================== */
+/* Chrome/Opera/Safari */
+::-webkit-input-placeholder {
+    color: inherit;
+    opacity: 0.7;
+}
+/* Firefox 19+ */
+::-moz-placeholder {
+    color: inherit;
+    opacity: 0.7;
+}
+/* IE 10+ */
+:-ms-input-placeholder {
+    color: inherit;
+    opacity: 0.7;
+}
+/* Firefox 18- */
+:-moz-placeholder {
+    color: inherit;
+    opacity: 0.7;
+}
+/* Animations
+   ============================================== */
+@-moz-keyframes border-pulsate {
+    0% {
+        border-color: #1486f0;
+    }
+    50% {
+        border-color: rgba(0,0,0,0.3);
+    }
+    100% {
+        border-color: #1486f0;
+    }
+}
+@-webkit-keyframes border-pulsate {
+    0% {
+        border-color: #1486f0;
+    }
+    50% {
+        border-color: rgba(0,0,0,0.3);
+    }
+    100% {
+        border-color: #1486f0;
+    }
+}
+@-o-keyframes border-pulsate {
+    0% {
+        border-color: #1486f0;
+    }
+    50% {
+        border-color: rgba(0,0,0,0.3);
+    }
+    100% {
+        border-color: #1486f0;
+    }
+}
+@keyframes border-pulsate {
+    0% {
+        border-color: #1486f0;
+    }
+    50% {
+        border-color: rgba(0,0,0,0.3);
+    }
+    100% {
+        border-color: #1486f0;
+    }
+}

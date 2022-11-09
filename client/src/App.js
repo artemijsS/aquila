@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { useRoutes } from "./routes";
 import { getProfileFetch } from "./redux/actions/user";
 import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App({ urlPath }) {
@@ -11,9 +12,7 @@ function App({ urlPath }) {
   const dispatch = useDispatch()
 
   useEffect(() => {
-      dispatch(getProfileFetch())?.then(() => {
-          console.log(1)
-      })
+      dispatch(getProfileFetch())
   }, [])
 
   return (
