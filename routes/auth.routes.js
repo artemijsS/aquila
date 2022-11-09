@@ -76,7 +76,7 @@ router.post('/login',
                 })
             }
 
-            const {telegram_username, password} = req.body;
+            const { telegram_username, password } = req.body;
 
             const user = await User.findOne({ telegram_username });
 
@@ -90,7 +90,7 @@ router.post('/login',
                 return res.status(400).json({ message: "Incorrect data" })
 
             if (user.twoFAuthentication) {
-                return res.json({ twoFA: true })
+                return res.json({ twoFA: true, telegram_username: user.telegram_username })
             }
 
             user.last_time_seen = new Date().toJSON();
@@ -146,7 +146,7 @@ router.post('/checkUserRegister', [
 
     try {
 
-        const {telegram_username} = req.body;
+        const { telegram_username } = req.body;
         const user = await User.findOne({ telegram_username });
 
         if (!user) {
@@ -158,5 +158,112 @@ router.post('/checkUserRegister', [
         res.status(500).json({ message: "Error" })
     }
 })
+
+// api/auth/2FA
+router.post('/2FA',
+    [
+        check('telegram_username', 'Incorrect username').notEmpty(),
+        check('code', 'Incorrect code').notEmpty().isLength({min: 4, max:4})
+    ],
+    async (req, res) => {
+
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    errors: errors.array(),
+                    message: "Validation issue"
+                })
+            }
+
+            const { telegram_username, code } = req.body;
+
+            const user = await User.findOne({ telegram_username });
+
+            if (!user) {
+                return res.status(400).json({ message: "User not found" })
+            }
+
+            let hashedCode = "";
+
+            try {
+                hashedCode = jwt.verify(user.twoFAuthenticationCodeToken, process.env.JWT_SECRET)
+            } catch (e) {
+                return res.status(203).json({ message: "Time limit" })
+            }
+
+            const isMatch = await bcrypt.compare(code, hashedCode.hashedCode)
+
+            if (!isMatch)
+
+                return res.status(400).json({ message: "Incorrect data" })
+
+            user.last_time_seen = new Date().toJSON();
+            await user.save()
+
+            const token = jwt.sign(
+                { userId: user.id, role: user.role },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            const username = user.telegram_username;
+            const role = user.role;
+
+            res.json({ token, username, role, telegram_chatId: user.telegram_chatId })
+
+        } catch (e) {
+            res.status(500).json({ message: "Error" })
+        }
+    })
+
+// api/auth/2FA
+router.post('/2FAGenerate',
+    [
+        check('telegram_username', 'Incorrect username').notEmpty()
+    ],
+    async (req, res) => {
+
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    errors: errors.array(),
+                    message: "Validation issue"
+                })
+            }
+
+            const { telegram_username } = req.body;
+
+            const user = await User.findOne({ telegram_username });
+
+            if (!user) {
+                return res.status(400).json({ message: "User not found" })
+            }
+
+            let code = '';
+            let characters = '0123456789';
+            let charactersLength = characters.length;
+            for (let i = 0; i < 4; i++) {
+                code += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+
+            const hashedCode = await bcrypt.hash(code, 12)
+
+            user.twoFAuthenticationCodeToken = jwt.sign(
+                {hashedCode},
+                process.env.JWT_SECRET,
+                {expiresIn: '40s'}
+            )
+            await user.save()
+
+            await bot.sendMessage(user.telegram_chatId, "code - " + code)
+
+        } catch (e) {
+            res.status(500).json({ message: "Error" })
+        }
+    })
 
 module.exports = router;

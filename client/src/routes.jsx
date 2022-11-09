@@ -25,7 +25,7 @@ export const useRoutes = (urlPath) => {
             </Routes>
         )
     } else {
-        if (userData.telegram_username) {
+        if (userData.role) {
             return (
                 <Routes>
                     <Route path="/overview" element={ <OverviewPage/> }/>

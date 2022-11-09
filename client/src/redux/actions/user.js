@@ -1,4 +1,4 @@
-import { setUserLoading } from "./loading";
+import {set2FALoading, setUserLoading} from "./loading";
 
 export const userDataFetch = (obj, path) => {
     return dispatch => {
@@ -18,9 +18,8 @@ export const userDataFetch = (obj, path) => {
                     return "error"
                 } else {
                     if (data.twoFA) {
-                        console.log("2FA")
                         dispatch(setUserLoading(false))
-                        dispatch(set2FA(true))
+                        dispatch(set2FA({_2FA: true, telegram_username: data.telegram_username}))
                         return "2FA"
                     }
                     localStorage.setItem("token", data.token)
@@ -71,6 +70,45 @@ export const getProfileFetch = () => {
     }
 }
 
+export const TwoFA = (telegram_username, code) => {
+    return dispatch => {
+        dispatch(set2FALoading(true))
+        return fetch(process.env.REACT_APP_SERVER + `/api/auth/2FA`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify({telegram_username: telegram_username, code: code})
+        })
+            .then(resp => {
+                if (resp.status === 203) {
+                    dispatch(set2FALoading(false))
+                    return 'TL'
+                }
+                return resp.json()
+            })
+            .then(data => {
+                if (data === 'TL') {
+                    return 'TL'
+                }
+                if (data.message) {
+                    dispatch(set2FALoading(false))
+                    return "error"
+                } else {
+                    localStorage.setItem("token", data.token)
+                    const user = {
+                        telegram_username: data.username,
+                        telegram_chatId: data.telegram_chatId,
+                        role: data.role
+                    }
+                    dispatch(loginUser(user))
+                    dispatch(set2FALoading(false))
+                }
+            })
+    }
+}
+
 export const logoutUser = () => {
     return dispatch => {
         dispatch(logout())
@@ -89,7 +127,7 @@ const loginUser = obj => ({
     payload: obj
 })
 
-const set2FA = bool => ({
+export const set2FA = obj => ({
     type: 'USER_2FA',
-    payload: bool
+    payload: obj
 })

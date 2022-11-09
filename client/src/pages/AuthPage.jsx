@@ -22,9 +22,7 @@ function AuthPage () {
     }
 
     useEffect(() => {
-        if (userData._2FA) {
-            set2FA(true)
-        }
+        set2FA(userData._2FA)
     }, [userData])
 
     const submit = event => {

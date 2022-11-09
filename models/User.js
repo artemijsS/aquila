@@ -9,7 +9,8 @@ const schema = new Schema({
     BINANCE_API_SECRET: {type: String},
     description: {type: String},
     last_time_seen: {type: String},
-    twoFAuthentication: {type: Boolean}
+    twoFAuthentication: {type: Boolean},
+    twoFAuthenticationCodeToken: {type: String}
 })
 
 module.exports = model('User', schema)

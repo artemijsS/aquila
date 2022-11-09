@@ -1,5 +1,6 @@
 const initialState = {
-    userLoading: true
+    userLoading: true,
+    _2FALoading: false
 }
 
 const loading = (state = initialState, action) => {
@@ -8,6 +9,11 @@ const loading = (state = initialState, action) => {
             return {
                 ...state,
                 userLoading: action.payload
+            }
+        case 'LOADING_2FA':
+            return {
+                ...state,
+                _2FALoading: action.payload
             }
         default:
             return state
