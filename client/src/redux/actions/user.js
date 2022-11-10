@@ -19,7 +19,7 @@ export const userDataFetch = (obj, path) => {
                 } else {
                     if (data.twoFA) {
                         dispatch(setUserLoading(false))
-                        dispatch(set2FA({_2FA: true, telegram_username: data.telegram_username}))
+                        dispatch(set2FA({_2FA: true, telegram_username: data.telegram_username, token: data.token}))
                         return "2FA"
                     }
                     localStorage.setItem("token", data.token)

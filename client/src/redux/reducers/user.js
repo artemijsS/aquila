@@ -20,7 +20,8 @@ const user = (state = initialState, action) => {
                 userData: {
                     ...state.userData,
                     _2FA: action.payload._2FA,
-                    telegram_username: action.payload.telegram_username
+                    telegram_username: action.payload.telegram_username,
+                    token: action.payload.token
                 }
             }
         default:

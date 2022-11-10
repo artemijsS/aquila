@@ -90,7 +90,12 @@ router.post('/login',
                 return res.status(400).json({ message: "Incorrect data" })
 
             if (user.twoFAuthentication) {
-                return res.json({ twoFA: true, telegram_username: user.telegram_username })
+                const token = jwt.sign(
+                    { telegram_username },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '1min' }
+                );
+                return res.json({ twoFA: true, telegram_username: user.telegram_username, token: token })
             }
 
             user.last_time_seen = new Date().toJSON();
@@ -221,7 +226,7 @@ router.post('/2FA',
 // api/auth/2FA
 router.post('/2FAGenerate',
     [
-        check('telegram_username', 'Incorrect username').notEmpty()
+        check('token', 'Incorrect token').notEmpty()
     ],
     async (req, res) => {
 
@@ -235,7 +240,9 @@ router.post('/2FAGenerate',
                 })
             }
 
-            const { telegram_username } = req.body;
+            const { token } = req.body;
+
+            const telegram_username = jwt.verify(token, process.env.JWT_SECRET).telegram_username
 
             const user = await User.findOne({ telegram_username });
 

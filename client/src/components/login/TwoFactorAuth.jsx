@@ -22,7 +22,7 @@ function TwoFactorAuth () {
     }
 
     useEffect(() => {
-        axios.post(process.env.REACT_APP_SERVER + "/api/auth/2FAGenerate", {telegram_username: userData.telegram_username})
+        axios.post(process.env.REACT_APP_SERVER + "/api/auth/2FAGenerate", {token: userData.token})
     }, [])
 
     const onSubmit = (e) => {
