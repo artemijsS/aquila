@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400italic');
 
 body {
   margin: 0;
@@ -141,8 +142,134 @@ code {
 
 .main-window {
   position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+.block {
+  width: 90%;
+  /*min-height: 600px;*/
+  margin-bottom: 80px;
+  background-color: white;
+  border-radius: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.block h1 {
+  text-align: center;
+}
+.block:first-of-type {
+  margin-top: 60px;
+}
+.block .search {
+  display: flex;
+  align-items: center;
+  width: 90%;
+}
+.block .search input {
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: 1.1rem;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.3);
+  border-radius: 2px 2px 0 0;
+  transition: background-color 0.3s, color 0.3s, opacity 0.3s;
+}
+.block .search .plus {
+  width: 30px;
+  height: 30px;
+}
+.block .search .plus.pulse {
+  fill: #1486f0;
+  animation-name: pulse;
+  animation-duration: 1s;
+  animation-timing-function: ease-out;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+  animation-play-state: running;
+}
+.block .search .plus:hover {
+  cursor: pointer;
+  fill: #1486f0;
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.3);
+  }
+}
+.block .search input:focus {
+  border-bottom: 2px solid #1486f0;
+  outline: none;
+}
+.block .cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 90%;
+  gap: 50px 200px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.block .cards .card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 250px;
+  flex: 1;
+  height: 330px;
+  background-color: white;
+  border-radius: 1.1rem;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+}
+.block .cards .card .info {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px 15px;
+}
+.block .cards .card .info .data {
+  display: flex;
+  width: 100%;
+}
+.block .cards .card .info .data .key {
+  font-weight: bold;
+  flex: 1;
+}
+.block .cards .card .info .data .value {
+  flex: 1;
+}
+.block .down {
+  width: 90%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.block .down svg:hover {
+  cursor: pointer;
+}
+.block .down svg:hover.edit {
+  fill: #1486f0;
+}
+.block .down svg:hover.delete {
+  fill: #eb3b3b;
+}
+.block .down .load-more button {
+  background-color: black;
+  color: white;
+}
+.block .down .load-more button:hover {
+  background-color: #f0f2f5;
+  color: black;
+}
 
 /*                  NAVIGATION*/
 .navigation {
@@ -156,6 +283,22 @@ code {
   background-color: #f0f5f0;
   color: black;
 }
+.navigation.fadeOut {
+  animation: fadeOut 0.5s forwards;
+}
+.navigation.fadeIn {
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1}
+  100% {opacity: 0; position:absolute; visibility: hidden}
+}
+@keyframes fadeIn {
+  0% { opacity: 0; position: relative; visibility: visible}
+  100% {opacity: 1}
+}
+
 
 @media screen and (max-width: 1100px) {
   .navigation {
@@ -252,8 +395,14 @@ button:hover {
 /*mobile nav*/
 .mobile-nav {
   display: none;
+  position: fixed;
+  z-index: 99;
   width: 40vw;
   min-width: 150px;
+  max-width: 300px;
+}
+.mobile-nav.minimized {
+  display: block;
 }
 
 .checkbox {
@@ -370,7 +519,7 @@ button:hover {
 }
 
 .full-screen {
-  width: 100vw;
+  /*width: 100vw;*/
   height: 100vh;
   min-width: 300px;
   min-height: 300px;
@@ -384,4 +533,92 @@ button[disabled] {
   -moz-opacity: 0.3;
   -khtml-opacity: 0.3;
   opacity: 0.3;
+}
+button.close {
+  background-color: #eb3b3b;
+  color: white;
+}
+button.close:hover {
+  background-color: #ff0000;
+  color: white;
+}
+button.save {
+  background-color: #1486f0;
+  color: white;
+}
+button.save:hover {
+  background-color: #0055ff;
+  color: white;
+}
+
+input {
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: 1.1rem;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.3);
+  border-radius: 2px 2px 0 0;
+  transition: background-color 0.3s, color 0.3s, opacity 0.3s;
+}
+input:focus {
+  border-bottom: 2px solid #1486f0;
+  outline: none;
+}
+textarea {
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: 1.1rem;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.3);
+  border-radius: 2px 2px 0 0;
+  transition: background-color 0.3s, color 0.3s, opacity 0.3s;
+  max-height: 125px;
+  max-width: 300px;
+}
+textarea:focus {
+  border-bottom: 2px solid #1486f0;
+  outline: none;
+}
+
+/*QUOTES*/
+.blockquote {
+  padding: 60px 80px 40px;
+  position: relative;
+}
+.blockquote p {
+  font-family: "Utopia-italic";
+  font-size: 35px;
+  font-weight: 700px;
+  text-align: center;
+}
+
+/*blockquote p::before {
+    content: "\f095";
+    font-family: FontAwesome;
+   display: inline-block;
+   padding-right: 6px;
+   vertical-align: middle;
+  font-size: 180px;
+ }*/
+
+.blockquote:before {
+  position: absolute;
+  font-family: 'FontAwesome';
+  top: 0;
+
+  content: '❝';
+  font-size: 200px;
+  color: rgba(0,0,0,0.1);
+
+}
+
+.blockquote::after {
+  content: "";
+  top: 20px;
+  left: 50%;
+  margin-left: -100px;
+  position: absolute;
+  border-bottom: 3px solid #1486f0;
+  height: 3px;
+  width: 200px;
 }

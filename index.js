@@ -16,7 +16,10 @@ const PORT = process.env.PORT || 5000;
 app.use('/api/auth', require('./routes/auth.routes'));
 
 // signals
-app.use('/api/signal', require('./routes/signal.routes'));
+app.use('/api/signals', require('./routes/signals.routes'));
+
+// strategies
+app.use('/api/strategies', require('./routes/strategies.routes'));
 
 //**************************
 //  REACT APP

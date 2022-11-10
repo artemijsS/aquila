@@ -24,6 +24,7 @@ export const userDataFetch = (obj, path) => {
                     }
                     localStorage.setItem("token", data.token)
                     const user = {
+                        token: data.token,
                         telegram_username: data.username,
                         telegram_chatId: data.telegram_chatId,
                         role: data.role
@@ -56,6 +57,7 @@ export const getProfileFetch = () => {
                         dispatch(setUserLoading(false))
                     } else {
                         const user = {
+                            token: token,
                             telegram_username: data.username,
                             telegram_chatId: data.telegram_chatId,
                             role: data.role
@@ -98,6 +100,7 @@ export const TwoFA = (telegram_username, code) => {
                 } else {
                     localStorage.setItem("token", data.token)
                     const user = {
+                        token: data.token,
                         telegram_username: data.username,
                         telegram_chatId: data.telegram_chatId,
                         role: data.role

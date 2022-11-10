@@ -62,6 +62,10 @@ function TwoFactorAuth () {
         }
     }
 
+    const onBackClick = () => {
+        dispatch(set2FA(false))
+    }
+
     return (
         <div className="login-screen">
             <div className="login">
@@ -70,7 +74,7 @@ function TwoFactorAuth () {
                     <form id="2FAForm" onSubmit={onSubmit}>
                         <h1>TWO-FACTOR AUTHENTICATION</h1>
                         <div className="form__group form__pincode">
-                            <label>Enter 4-digit code from your telegram</label>
+                            <label>Enter 4-digit code</label>
                             <input ref={inputs[1]} type="number" name="pincode-1" maxLength="1" pattern="[0-9]" tabIndex="1" disabled={disabledInputs}
                                    placeholder="·" autoComplete="off" onInput={event => onInput(event, 1, 2)}/>
                             <input ref={inputs[2]} type="tel" name="pincode-2" maxLength="1" pattern="[0-9]" tabIndex="2" disabled={disabledInputs}
@@ -81,7 +85,7 @@ function TwoFactorAuth () {
                                    placeholder="·" autoComplete="off" onInput={event => onInput(event, 4)} onKeyDown={event => handleKeyDown(event, 3)}/>
                         </div>
                         <div className="form__buttons">
-                            <button disabled={true}>Continue</button>
+                            <button className="mrt10" onClick={onBackClick} disabled={disabledInputs}>Back</button>
                         </div>
                     </form>
                 </div>

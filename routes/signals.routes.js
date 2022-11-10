@@ -3,7 +3,7 @@ const { bot }  = require('../telegram/telegram');
 
 const router = Router();
 
-// api/signal/new
+// api/signals/new
 router.get('/new', (req, res) => {
     try {
         // console.log(req)

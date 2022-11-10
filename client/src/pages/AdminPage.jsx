@@ -1,6 +1,6 @@
 import React from 'react'
 import { Helmet } from "react-helmet";
-import { Navigation } from "../components";
+import { Navigation, AdminStrategies } from "../components";
 
 function AdminPage () {
 
@@ -12,7 +12,9 @@ function AdminPage () {
             <div className="wrapper full-screen">
                 <Navigation activeRoute="admin"/>
                 <div className="main-window">
-
+                    <AdminStrategies />
+                    {/*<AdminStrategies />*/}
+                    {/*<AdminStrategies />*/}
                 </div>
             </div>
         </div>
