@@ -1,3 +1,5 @@
 export { default as Navigation } from "./navigation/Navigation"
 export { default as TwoFactorAuth } from "./login/TwoFactorAuth"
-export { default as AdminStrategies } from "./admin/AdminStrategies"
+export { default as Block } from "./main/Block"
+export { default as Search } from "./main/Search"
+export { default as AdminStrategyCard } from "./admin/AdminStrategyCard"

@@ -75,7 +75,7 @@ router.get('/get', auth,
 
             count = await Strategy.countDocuments()
 
-            res.json({page: page, pages: Math.ceil(count/size), strategies: strategies})
+            res.json({page: page, pages: Math.ceil(count/size), data: strategies})
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }

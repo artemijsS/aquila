@@ -1,6 +1,6 @@
 import React from 'react'
 import { Helmet } from "react-helmet";
-import { Navigation, AdminStrategies } from "../components";
+import { Navigation, Block, AdminStrategyCard } from "../components";
 
 function AdminPage () {
 
@@ -12,9 +12,9 @@ function AdminPage () {
             <div className="wrapper full-screen">
                 <Navigation activeRoute="admin"/>
                 <div className="main-window">
-                    <AdminStrategies />
-                    {/*<AdminStrategies />*/}
-                    {/*<AdminStrategies />*/}
+                    <Block title={"Strategies"} objectForm={{urlId: '', name: '', description: '', percentage: '', source: ''}} urlPath={"strategies"}>
+                        <AdminStrategyCard/>
+                    </Block>
                 </div>
             </div>
         </div>
