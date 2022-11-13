@@ -6,7 +6,7 @@ import axios from "axios";
 import { logoutUser } from "../../redux/actions/user";
 import { Search } from "../index";
 
-function Block ({title, objectForm, urlPath, children}) {
+function Block ({title, objectForm, urlPath, children, newElement = true, list = false}) {
 
     const dispatch = useDispatch()
 
@@ -28,6 +28,8 @@ function Block ({title, objectForm, urlPath, children}) {
 
     const onAddNew = (obj) => {
         if (page+1 === pages || data.length === 0) {
+            if (data.length === 0)
+                setPages(1)
             setData(data.concat(obj))
         }
     }
@@ -35,6 +37,8 @@ function Block ({title, objectForm, urlPath, children}) {
     const onDeleting = (id) => {
         let index = data.indexOf(id);
         if (index !== -1) {
+            if (data.length === 1)
+                setPages(0)
             setData(data.splice(index,1))
         }
     }
@@ -44,6 +48,7 @@ function Block ({title, objectForm, urlPath, children}) {
             setPage(Number(res.data.page))
             setPages(Number(res.data.pages))
             setData(data.concat(res.data.data))
+            console.log(res.data)
         }, err => {
             if (err.response.status === 401) {
                 toast.warn("Authorization period expired")
@@ -57,10 +62,10 @@ function Block ({title, objectForm, urlPath, children}) {
             <div className="title">
                 <h1>{title}</h1>
             </div>
-            <Search data={data} onCreate={onCreate} newData={newDataCard}/>
-            <div className="cards">
+            <Search data={data} onCreate={onCreate} newData={newDataCard} newElement={newElement}/>
+            <div className={list ? "cards list" : "cards"}>
                 {newDataCard &&
-                    React.cloneElement(children, { strategy: objectForm, editable: true, close: onCloseCreate, addNew: onAddNew })
+                    React.cloneElement(children, { data: objectForm, editable: true, close: onCloseCreate, addNew: onAddNew })
                 }
 
                 {pages === 0 && !newDataCard &&
@@ -71,13 +76,13 @@ function Block ({title, objectForm, urlPath, children}) {
 
                 {pages !== 0 && !newDataCard &&
                     data.map((obj, index) =>
-                        React.cloneElement(children, { strategy: obj, key: index, onDeleting:onDeleting })
+                        React.cloneElement(children, { data: obj, key: index, onDeleting:onDeleting })
                     )
                 }
             </div>
             <div className="down">
                 <div className="load-more">
-                    <button onClick={() => {setPage(page+1)}} disabled={page+1 === pages}>Load more</button>
+                    <button onClick={() => {setPage(page+1)}} disabled={page+1 === pages || page === pages}>Load more</button>
                 </div>
             </div>
         </div>

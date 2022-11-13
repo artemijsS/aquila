@@ -224,7 +224,7 @@ code {
   align-items: center;
   min-width: 369px;
   flex: 1;
-  height: 330px;
+  min-height: 330px;
   background-color: white;
   border-radius: 1.1rem;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
@@ -279,6 +279,37 @@ code {
   }
 }
 
+.block .cards.list {
+  display: flex;
+  flex-direction: column;
+}
+.block .cards.list .card {
+  display: flex;
+  flex-direction: row;
+  /*gap: 10px;*/
+  justify-content: space-between;
+  min-height: min-content;
+}
+@media screen and (max-width: 830px) {
+  .block .cards.list .card.editable {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .block .cards.list .card.editable .down {
+    margin-bottom: 20px;
+  }
+}
+.block .cards.list .card .name {
+  margin-left: 40px;
+}
+.block .cards.list .card .down {
+  margin-bottom: 0;
+  margin-right: 5%;
+}
+.block .cards.list .card .blockquote {
+  flex: 1;
+}
+
 .block .down {
   width: 90%;
   display: flex;
@@ -309,10 +340,10 @@ code {
   display: flex;
   flex-direction: column;
   width: 250px;
+  height: 100vh;
   border-right: 1px solid white;
   align-items: center;
   font-size: 25px;
-  padding-top: 20px;
   background-color: #f0f5f0;
   color: black;
 }
@@ -358,6 +389,7 @@ code {
 
 .navigation .username {
   margin-bottom: 70px;
+  margin-top: 20px;
   font-size: 1.1em;
   display: flex;
   align-items: center;
@@ -552,8 +584,7 @@ button:hover {
 }
 
 .full-screen {
-  /*width: 100vw;*/
-  height: 100vh;
+  /*height: 100vh;*/
   min-width: 300px;
   min-height: 300px;
 }
@@ -615,6 +646,51 @@ textarea:focus {
   border-bottom: 2px solid #1486f0;
   outline: none;
 }
+
+/* toggle-pill-color */
+.toggle-pill-color input[type="checkbox"] {
+  display: none;
+}
+.toggle-pill-color input[type="checkbox"] + label {
+  display: block;
+  position: relative;
+  width: 3em;
+  height: 1.6em;
+  border-radius: 1em;
+  background: #e84d4d;
+  box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-transition: background 0.1s ease-in-out;
+  transition: background 0.1s ease-in-out;
+}
+.toggle-pill-color input[type="checkbox"] + label:before {
+  content: "";
+  display: block;
+  width: 1.2em;
+  height: 1.2em;
+  border-radius: 1em;
+  background: #fff;
+  box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  left: 0.2em;
+  top: 0.2em;
+  -webkit-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+.toggle-pill-color input[type="checkbox"]:checked + label {
+  background: #47cf73;
+}
+.toggle-pill-color input[type="checkbox"]:checked + label:before {
+  box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.2);
+  left: 1.6em;
+}
+.toggle-pill-color input[disabled] + label {
+  cursor: not-allowed;
+}
+/* toggle-pill-color end */
 
 /*QUOTES*/
 .blockquote {

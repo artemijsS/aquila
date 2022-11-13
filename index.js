@@ -18,6 +18,12 @@ app.use('/api/auth', require('./routes/auth.routes'));
 // signals
 app.use('/api/signals', require('./routes/signals.routes'));
 
+// user
+app.use('/api/user', require('./routes/user.routes'));
+
+// userNew
+app.use('/api/userNew', require('./routes/userNew.routes'));
+
 // strategies
 app.use('/api/strategies', require('./routes/strategies.routes'));
 

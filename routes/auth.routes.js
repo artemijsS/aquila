@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { bot } = require('../telegram/telegram')
 
 const User = require('../models/User');
+const NewUser = require('../models/NewUser');
 
 const router = Router();
 
@@ -35,6 +36,12 @@ router.post('/register',
                 return res.status(400).json("User already registered")
             }
 
+            // user access check
+            let newUser = await NewUser.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
+            if (!newUser) {
+                return res.status(400).json("User do not have access to register")
+            }
+
             const hashedPass = await bcrypt.hash(password, 12)
             const user = new User({
                 telegram_username,
@@ -44,6 +51,8 @@ router.post('/register',
             });
 
             await user.save();
+
+            await NewUser.deleteOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
 
             const token = jwt.sign(
                 { userId: user.id, role: user.role },
