@@ -12,7 +12,7 @@ export const useRoutes = (urlPath) => {
     const [url, setUrl] = useState(urlPath)
 
     useEffect(() => {
-        if (!pages.includes(urlPath)) {
+        if (!pages.includes(urlPath) || (adminPages.includes(urlPath) && userData.role !== "admin")) {
             setUrl("/overview")
         }
     }, [])
@@ -51,3 +51,4 @@ export const useRoutes = (urlPath) => {
 }
 
 const pages = ["/overview", "/strategies", "/signals", "/settings", "/admin"]
+const adminPages = ["/admin"]
