@@ -15,11 +15,21 @@ router.get('/get', auth, admin,
             let page = 0
             let size = 2
             let count;
+            let search = '';
+
             if (req.query.page) {
                 page = req.query.page
             }
+            if (req.query.search) {
+                search = req.query.search
+            }
 
-            const users = await User.find().select(['telegram_username', 'telegram_chatId', 'role', 'twoFAuthentication', 'description', 'disabled']).limit(size).skip(size * page).sort({
+            const users = await User.find({ $or: [{telegram_username: {$regex: search, $options: 'i'}},
+                    {telegram_chatId: {$regex: search, $options: 'i'}},
+                    {role: {$regex: search, $options: 'i'}}
+                ] })
+                .select(['telegram_username', 'telegram_chatId', 'role', 'twoFAuthentication', 'description', 'disabled'])
+                .limit(size).skip(size * page).sort({
                 telegram_username: "asc"
             })
 

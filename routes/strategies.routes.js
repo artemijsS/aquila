@@ -65,11 +65,17 @@ router.get('/get', auth,
             let page = 0
             let size = 2
             let count;
+            let search = '';
+
             if (req.query.page) {
                 page = req.query.page
             }
+            if (req.query.search) {
+                search = req.query.search
+            }
 
-            const strategies = await Strategy.find().limit(size).skip(size * page).sort({
+            const strategies = await Strategy.find({ $or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}] })
+                .limit(size).skip(size * page).sort({
                 name: "asc"
             })
 

@@ -56,11 +56,17 @@ router.get('/get', auth, admin,
             let page = 0
             let size = 2
             let count;
+            let search = '';
+
             if (req.query.page) {
                 page = req.query.page
             }
+            if (req.query.search) {
+                search = req.query.search
+            }
 
-            const userInvites = await UserInvite.find().select(['telegram_username']).limit(size).skip(size * page).sort({
+            const userInvites = await UserInvite.find({telegram_username: {$regex: search, $options: 'i'}})
+                .select(['telegram_username']).limit(size).skip(size * page).sort({
                 telegram_username: "asc"
             })
 

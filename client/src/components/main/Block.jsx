@@ -16,6 +16,8 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
     const [page, setPage] = useState(0)
     const [pages, setPages] = useState(0)
 
+    const [search, setSearch] = useState('')
+
     const [delAdd, setDelAdd] = useState(0)
 
     const [newDataCard, setNewDataCard] = useState(false)
@@ -39,9 +41,17 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
         page ? setPage(0) : setDelAdd(delAdd+1)
     }
 
+    const onSearchChange = (text) => {
+        setData([])
+        setSearch(text)
+    }
+
     useEffect(() => {
         setLoading(true)
-        axios.get(process.env.REACT_APP_SERVER + `/api/${urlPath}/get?page=${page}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+        let crPage = page
+        if (search)
+            crPage = 0
+        axios.get(process.env.REACT_APP_SERVER + `/api/${urlPath}/get?page=${crPage}&search=${search}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
             setPage(Number(res.data.page))
             setPages(Number(res.data.pages))
             setData(data.concat(res.data.data))
@@ -54,14 +64,14 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
             }
             setLoading(false)
         })
-    }, [page, delAdd])
+    }, [page, delAdd, search])
 
     return (
         <div className="block">
             <div className="title">
                 <h1>{title}</h1>
             </div>
-            <Search data={data} onCreate={onCreate} newData={newDataCard} newElement={newElement}/>
+            <Search data={data} onCreate={onCreate} newData={newDataCard} newElement={newElement} onSearchChange={onSearchChange}/>
             <div className={list ? "cards list" : "cards"}>
                 {loading &&
                 <ContentLoader width={"100%"} className={"card"}>
@@ -73,7 +83,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
                     React.cloneElement(children, { data: objectForm, editable: true, close: onCloseCreate, addNew: onAddNew })
                 }
 
-                {pages === 0 && !newDataCard && !loading &&
+                {!newDataCard && !loading && data.length === 0 &&
                 <div className="card">
                     <blockquote className="blockquote"><p>what is not there is not</p></blockquote>
                 </div>

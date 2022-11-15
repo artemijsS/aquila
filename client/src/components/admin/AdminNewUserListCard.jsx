@@ -38,7 +38,7 @@ function AdminUserCard ({ data, editable = false, addNew = null, onDeleting = nu
                 toast.warn("User with this username already registered")
                 input.current.classList.add('red')
             } else if (err.response.data.error === 2) {
-                toast.warn("User access already given to this username")
+                toast.warn("User invite already given to this username")
                 input.current.classList.add('red')
             } else {
                 toast.error("Error, try one more time")
