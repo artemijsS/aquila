@@ -33,13 +33,13 @@ router.post('/register',
             // username check
             let candidate = await User.findOne({ telegram_username })
             if (candidate) {
-                return res.status(400).json("User already registered")
+                return res.status(400).json({ message: "User already registered" })
             }
 
             // user access check
             let userInvite = await UserInvite.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
             if (!userInvite) {
-                return res.status(400).json("User do not have access to register")
+                return res.status(400).json({ message: "User do not have access to register" })
             }
 
             const hashedPass = await bcrypt.hash(password, 12)
@@ -163,11 +163,18 @@ router.post('/checkUserRegister', [
         const { telegram_username } = req.body;
         const user = await User.findOne({ telegram_username });
 
-        if (!user) {
-            return res.json(false);
+        // user registration check
+        if (user) {
+            return res.json(true);
         }
 
-        res.json(true);
+        // user access check
+        let userInvite = await UserInvite.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
+        if (!userInvite) {
+            return res.status(400).json({error: 1, message: "You do not have access to register"})
+        }
+
+        res.json(false);
     } catch (e) {
         res.status(500).json({ message: "Error" })
     }

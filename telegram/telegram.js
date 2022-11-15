@@ -25,7 +25,7 @@ bot.onText(/\/start/, (msg) => {
                         password,
                         telegram_chatId,
                     }).then(_res => {
-                        bot.sendMessage(telegram_chatId, "Registration Successful");
+                        bot.sendMessage(telegram_chatId, "Registration successful");
                         bot.clearReplyListeners();
                     }).catch(err => {
                         const error_msg = errorMsg(err);
@@ -34,7 +34,12 @@ bot.onText(/\/start/, (msg) => {
                 })
             })
         } else {
-            bot.sendMessage(telegram_chatId, 'You are already registered');
+            if (isRegistered === true)
+                bot.sendMessage(telegram_chatId, 'You are already registered');
+            else {
+                const err = errorMsg(isRegistered)
+                bot.sendMessage(telegram_chatId, err);
+            }
         }
     });
 });
