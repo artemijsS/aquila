@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { bot } = require('../telegram/telegram')
 
 const User = require('../models/User');
-const NewUser = require('../models/NewUser');
+const UserInvite = require('../models/UserInvite');
 
 const router = Router();
 
@@ -37,8 +37,8 @@ router.post('/register',
             }
 
             // user access check
-            let newUser = await NewUser.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
-            if (!newUser) {
+            let userInvite = await UserInvite.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
+            if (!userInvite) {
                 return res.status(400).json("User do not have access to register")
             }
 
@@ -52,7 +52,7 @@ router.post('/register',
 
             await user.save();
 
-            await NewUser.deleteOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
+            await UserInvite.deleteOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
 
             const token = jwt.sign(
                 { userId: user.id, role: user.role },
@@ -87,7 +87,7 @@ router.post('/login',
 
             const { telegram_username, password } = req.body;
 
-            const user = await User.findOne({ telegram_username });
+            const user = await User.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') });
 
             if (!user) {
                 return res.status(400).json({ message: "User not found" })
@@ -193,7 +193,7 @@ router.post('/2FA',
 
             const { telegram_username, code } = req.body;
 
-            const user = await User.findOne({ telegram_username });
+            const user = await User.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') });
 
             if (!user) {
                 return res.status(400).json({ message: "User not found" })
@@ -253,7 +253,7 @@ router.post('/2FAGenerate',
 
             const telegram_username = jwt.verify(token, process.env.JWT_SECRET).telegram_username
 
-            const user = await User.findOne({ telegram_username });
+            const user = await User.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') });
 
             if (!user) {
                 return res.status(400).json({ message: "User not found" })

@@ -18,7 +18,7 @@ function AdminPage () {
                     <Block title={"Users"} objectForm={{telegram_username: '', telegram_chatId: '', role: '', description: '', twoFAuthentication: '', disabled: ''}} urlPath={"user"} newElement={false}>
                         <AdminUserCard/>
                     </Block>
-                    <Block title={"New users access"} objectForm={{telegram_username: ''}} urlPath={"userNew"} list={true}>
+                    <Block title={"User invitations"} objectForm={{telegram_username: ''}} urlPath={"userNew"} list={true}>
                         <AdminNewUserListCard/>
                     </Block>
                 </div>

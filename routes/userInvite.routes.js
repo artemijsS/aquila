@@ -3,7 +3,7 @@ const { check, validationResult } = require('express-validator')
 const auth = require('../middleware/auth.middleware');
 const admin = require('../middleware/admin.middleware');
 
-const NewUser = require('../models/NewUser');
+const UserInvite = require('../models/UserInvite');
 const User = require('../models/User');
 
 const router = Router();
@@ -33,16 +33,16 @@ router.post('/new', auth, admin, [
             }
 
             // newUser check
-            candidate = await NewUser.findOne({ telegram_username })
+            candidate = await UserInvite.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
             if (candidate) {
                 return res.status(400).json({error: 2, value: "newUser"})
             }
 
-            const newUser = new NewUser({ telegram_username });
+            const userInvite = new UserInvite({ telegram_username });
 
-            await newUser.save();
+            await userInvite.save();
 
-            res.json({ newUser })
+            res.json({ userInvite })
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
@@ -60,13 +60,13 @@ router.get('/get', auth, admin,
                 page = req.query.page
             }
 
-            const newUsers = await NewUser.find().select(['telegram_username']).limit(size).skip(size * page).sort({
+            const userInvites = await UserInvite.find().select(['telegram_username']).limit(size).skip(size * page).sort({
                 telegram_username: "asc"
             })
 
-            count = await NewUser.countDocuments()
+            count = await UserInvite.countDocuments()
 
-            res.json({page: page, pages: Math.ceil(count/size), data: newUsers})
+            res.json({page: page, pages: Math.ceil(count/size), data: userInvites})
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
@@ -84,7 +84,7 @@ router.delete('/delete', auth, admin,
                 return res.status(400).json({error: 1, msg: "no telegram_username"})
             }
 
-            await NewUser.deleteOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
+            await UserInvite.deleteOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
 
             res.json({telegram_username: telegram_username, msg: "deleted"})
         } catch (e) {

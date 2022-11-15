@@ -3,7 +3,6 @@ const { check, validationResult } = require('express-validator')
 const auth = require('../middleware/auth.middleware');
 const admin = require('../middleware/admin.middleware');
 
-const NewUser = require('../models/NewUser');
 const User = require('../models/User');
 
 const router = Router();

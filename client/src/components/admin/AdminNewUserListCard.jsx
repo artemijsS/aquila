@@ -24,7 +24,7 @@ function AdminUserCard ({ data, editable = false, addNew = null, onDeleting = nu
     const onSave = () => {
         axios.post(process.env.REACT_APP_SERVER + "/api/userNew/new", dataForm,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
             toast.success("New user access saved")
-            addNew(res.data.newUser)
+            addNew(res.data.userInvite)
             close()
         }, err => {
             setEditError(true)
@@ -50,7 +50,7 @@ function AdminUserCard ({ data, editable = false, addNew = null, onDeleting = nu
         loading(true)
         if (window.confirm('Are you sure you want to delete ' + data.telegram_username + '?')) {
             axios.delete(process.env.REACT_APP_SERVER + `/api/userNew/delete?telegram_username=${data.telegram_username}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(_res => {
-                toast.success("User " + data.telegram_username + " deleted")
+                toast.success("User " + data.telegram_username + " invite deleted")
                 onDeleting(data)
                 cardRef.current.classList.add('delete')
             }, err => {

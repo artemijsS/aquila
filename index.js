@@ -22,7 +22,7 @@ app.use('/api/signals', require('./routes/signals.routes'));
 app.use('/api/user', require('./routes/user.routes'));
 
 // userNew
-app.use('/api/userNew', require('./routes/userNew.routes'));
+app.use('/api/userNew', require('./routes/userInvite.routes'));
 
 // strategies
 app.use('/api/strategies', require('./routes/strategies.routes'));

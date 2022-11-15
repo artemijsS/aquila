@@ -111,7 +111,7 @@ function AdminStrategyCard ({ data, editable = false, close = null, addNew = nul
     }
 
     return (
-        <div ref={cardRef} className="card" id={dataForm.urlId} key={key}>
+        <div ref={cardRef} className="card" key={key}>
             <div className="name">
                 <h1>
                     {editable ?
