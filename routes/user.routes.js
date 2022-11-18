@@ -107,7 +107,7 @@ router.post('/adminEdit', auth, admin, [
 
             await user.save();
 
-            res.json({user: { telegram_chatId: user.telegram_chatId, telegram_username, role, twoFAuthentication, description }})
+            res.json({user: { telegram_chatId: user.telegram_chatId, telegram_username, role, twoFAuthentication, description, disabled: user.disabled }})
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }

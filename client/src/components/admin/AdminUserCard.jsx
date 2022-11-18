@@ -30,6 +30,7 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
         console.log(dataForm)
         axios.post(process.env.REACT_APP_SERVER + "/api/user/adminEdit", dataForm,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
             toast.success("User edited")
+            console.log(res.data.user)
             setDataForm(res.data.user)
             onCloseEdit()
         }, err => {
@@ -114,8 +115,8 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
                     <div className="key">twoFAuthentication</div>
                     <div className="value">
                         <div className="toggle-pill-color">
-                            <input disabled={!edit} type="checkbox" id="pill3" name="twoFAuthentication" onChange={changeHandler} defaultChecked={dataForm.twoFAuthentication}/>
-                            <label htmlFor="pill3"/>
+                            <input disabled={!edit} type="checkbox" id={"pill2fa" + dataForm.telegram_username} name="twoFAuthentication" onChange={changeHandler} defaultChecked={dataForm.twoFAuthentication}/>
+                            <label htmlFor={"pill2fa" + dataForm.telegram_username}/>
                         </div>
                     </div>
                 </div>
@@ -123,8 +124,8 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
                     <div className="key">disabled</div>
                     <div className="value">
                         <div className="toggle-pill-color">
-                            <input disabled={!edit} type="checkbox" id="pill4" name="disabled" onChange={changeHandler} defaultChecked={dataForm.disabled}/>
-                            <label htmlFor="pill4"/>
+                            <input disabled={!edit} type="checkbox" id={"pillDis" + dataForm.telegram_username} name="disabled" onChange={changeHandler} defaultChecked={dataForm.disabled}/>
+                            <label htmlFor={"pillDis" + dataForm.telegram_username}/>
                         </div>
                     </div>
                 </div>
