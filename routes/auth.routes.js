@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { bot } = require('../telegram/telegram')
 
 const User = require('../models/User');
-const UserInvite = require('../models/UserInvite');
+const UserInvite = require('../models/User_invite');
 
 const router = Router();
 

@@ -4,4 +4,4 @@ const schema = new Schema({
     telegram_username: {type: String, required: true, unique: true}
 })
 
-module.exports = model('UserInvite', schema)
+module.exports = model('User_invite', schema)
