@@ -6,6 +6,6 @@ const schema = new Schema({
     disabled: {type: Boolean, required: true, default: false},
     amount: {type: Number, required: true},
     leverage: {type: Number, required: true}
-})
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 
 module.exports = model('User_strategies', schema)
