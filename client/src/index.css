@@ -208,6 +208,11 @@ code {
   border-bottom: 2px solid #1486f0;
   outline: none;
 }
+.block .search .update {
+  margin-left: 20px;
+  font-size: 1.2em;
+  text-transform: uppercase;
+}
 .block .cards {
   display: flex;
   flex-wrap: wrap;

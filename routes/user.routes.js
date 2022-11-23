@@ -33,7 +33,10 @@ router.get('/get', auth, admin,
                 telegram_username: "asc"
             })
 
-            count = await User.countDocuments()
+            count = await User.find({ $or: [{telegram_username: {$regex: search, $options: 'i'}},
+                    {telegram_chatId: {$regex: search, $options: 'i'}},
+                    {role: {$regex: search, $options: 'i'}}
+                ] }).countDocuments()
 
             res.json({page: page, pages: Math.ceil(count/size), data: users})
         } catch (e) {

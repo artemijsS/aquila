@@ -1,6 +1,13 @@
 import React from 'react'
 import { Helmet } from "react-helmet";
-import { Navigation, Block, AdminStrategyCard, AdminUserCard, AdminNewUserListCard } from "../components";
+import {
+    Navigation,
+    Block,
+    AdminStrategyCard,
+    AdminUserCard,
+    AdminNewUserListCard,
+    AdminCryptoListCard
+} from "../components";
 
 function AdminPage () {
 
@@ -20,6 +27,9 @@ function AdminPage () {
                     </Block>
                     <Block title={"User invitations"} objectForm={{telegram_username: ''}} urlPath={"userNew"} list={true}>
                         <AdminNewUserListCard/>
+                    </Block>
+                    <Block title={"Crypto"} objectForm={{name: '', quantityPrecision: ''}} urlPath={"crypto"} updatePath={"updateBinanceCrypto"} list={true} update={true} newElement={false}>
+                        <AdminCryptoListCard/>
                     </Block>
                 </div>
             </div>

@@ -4,7 +4,7 @@ import {toast} from "react-toastify";
 import {logoutUser} from "../../redux/actions/user";
 import {useDispatch, useSelector} from "react-redux";
 
-function AdminUserCard ({ data, editable = false, addNew = null, onDeleting = null, key = null, close = null }) {
+function AdminNewUserListCard ({ data, editable = false, addNew = null, onDeleting = null, key = null, close = null }) {
 
     const dispatch = useDispatch()
 
@@ -102,5 +102,5 @@ function AdminUserCard ({ data, editable = false, addNew = null, onDeleting = nu
     )
 }
 
-export default AdminUserCard;
+export default AdminNewUserListCard;
 

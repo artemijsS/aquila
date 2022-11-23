@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import {useDispatch, useSelector} from "react-redux";
 import ContentLoader, {List} from "react-content-loader"
 import { toast } from "react-toastify";
@@ -6,7 +6,7 @@ import axios from "axios";
 import { logoutUser } from "../../redux/actions/user";
 import { Search } from "../index";
 
-function Block ({title, objectForm, urlPath, children, newElement = true, list = false}) {
+function Block ({title, objectForm, urlPath, children, newElement = true, list = false, update = false, updatePath = null}) {
 
     const dispatch = useDispatch()
 
@@ -17,8 +17,6 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
     const [pages, setPages] = useState(0)
 
     const [search, setSearch] = useState('')
-
-    const [delAdd, setDelAdd] = useState(0)
 
     const [newDataCard, setNewDataCard] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -33,28 +31,49 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
     const onAddNew = (obj) => {
         setData([])
-        page ? setPage(0) : setDelAdd(delAdd+1)
+        loadData(0, search)
     }
 
     const onDeleting = (id) => {
         setData([])
-        page ? setPage(0) : setDelAdd(delAdd+1)
+        loadData(0, search)
     }
 
     const onSearchChange = (text) => {
         setData([])
         setSearch(text)
+        loadData(0, text, true)
+    }
+
+    const onUpdateData = () => {
+        setLoading(true)
+        axios.post(process.env.REACT_APP_SERVER + `/api/${urlPath}/${updatePath}`, {},{headers: {authorization: `Bearer ${userData.token}`}}).then(_res => {
+            setData([])
+            loadData(0, search, true)
+            toast.success("Crypto successfully updated from Binance")
+        }, err => {
+            if (err.response.status === 401) {
+                toast.warn("Authorization period expired")
+                dispatch(logoutUser())
+            }
+            toast.error("Error, try later")
+            setLoading(false)
+        })
     }
 
     useEffect(() => {
+        loadData(page, search)
+    }, [])
+
+    const loadData = (page, search, reset = false) => {
         setLoading(true)
-        let crPage = page
-        if (search)
-            crPage = 0
-        axios.get(process.env.REACT_APP_SERVER + `/api/${urlPath}/get?page=${crPage}&search=${search}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+        axios.get(process.env.REACT_APP_SERVER + `/api/${urlPath}/get?page=${page}&search=${search}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
             setPage(Number(res.data.page))
             setPages(Number(res.data.pages))
-            setData(data.concat(res.data.data))
+            if (reset)
+                setData(res.data.data)
+            else
+                setData(data.concat(res.data.data))
             console.log(res.data)
             setLoading(false)
         }, err => {
@@ -64,14 +83,14 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
             }
             setLoading(false)
         })
-    }, [page, delAdd, search])
+    }
 
     return (
         <div className="block">
             <div className="title">
                 <h1>{title}</h1>
             </div>
-            <Search data={data} onCreate={onCreate} newData={newDataCard} newElement={newElement} onSearchChange={onSearchChange}/>
+            <Search data={data} onCreate={onCreate} newData={newDataCard} newElement={newElement} update={update} onUpdateData={onUpdateData} onSearchChange={onSearchChange}/>
             <div className={list ? "cards list" : "cards"}>
                 {loading &&
                 <ContentLoader width={"100%"} className={"card"}>
@@ -97,7 +116,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
             </div>
             <div className="down">
                 <div className="load-more">
-                    <button onClick={() => {setPage(page+1)}} disabled={page+1 >= pages}>Load more</button>
+                    <button onClick={() => {setPage(page+1); loadData(page + 1, search)}} disabled={page+1 >= pages}>Load more</button>
                 </div>
             </div>
         </div>

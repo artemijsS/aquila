@@ -80,7 +80,7 @@ router.get('/get', auth,
                 name: "asc"
             })
 
-            count = await Strategy.countDocuments()
+            count = await Strategy.find({ $or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}] }).countDocuments()
 
             res.json({page: page, pages: Math.ceil(count/size), data: strategies})
         } catch (e) {
