@@ -27,6 +27,9 @@ app.use('/api/userNew', require('./routes/userInvite.routes'));
 // strategies
 app.use('/api/strategies', require('./routes/strategies.routes'));
 
+// userStrategies
+app.use('/api/userStrategies', require('./routes/userStrategies.routes'));
+
 // crypto
 app.use('/api/crypto', require('./routes/crypto.routes'));
 

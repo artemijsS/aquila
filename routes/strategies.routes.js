@@ -235,43 +235,9 @@ router.post('/edit', auth, admin, [
 
 
 //                  userActions
-// api/strategies/getMy
-router.get('/getMy', auth,
-    async (req, res) => {
-        try {
 
-            let page = 0
-            let size = 2
-            let count;
-            let search = '';
-
-            if (req.query.page) {
-                page = req.query.page
-            }
-            if (req.query.search) {
-                search = req.query.search
-            }
-
-            const userId = req.user.userId
-
-            const userStrategies = await UserStrategies.find({ userId: userId }).populate('Strategy', ['urlId', 'name'])
-                .find({ $or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}] })
-                .limit(size).skip(size * page).sort({
-                    name: "asc"
-                })
-
-            count = await UserStrategies.find({ userId: userId }).populate('Strategy')
-                .find({ $or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}] })
-                .countDocuments()
-
-            res.json({page: page, pages: Math.ceil(count/size), data: userStrategies})
-        } catch (e) {
-            res.status(500).json({ message: "Error!!!!!!!!!" })
-        }
-    })
-
-// api/strategies/getUser
-router.get('/getStrategies', auth,
+// api/strategies/user/get
+router.get('/user/get', auth,
     async (req, res) => {
         try {
 
@@ -291,12 +257,42 @@ router.get('/getStrategies', auth,
 
             const userStrategiesTmp = await UserStrategies.find({ userId: userId }).select('strategyId')
             const userStrategies = userStrategiesTmp.map(obj => obj.strategyId)
-            console.log(userStrategies)
 
-            const strategies = await Strategy.find({$and: [ {$or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}] }, {_id: {$nin: userStrategies}} ]})
-                .limit(size).skip(size * page).sort({
-                    name: "asc"
-                })
+            const strategies = await Strategy.aggregate([
+                { $match: { $and: [ {$or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}]}, {_id: {$nin: userStrategies}} ] } },
+                {
+                    $lookup: {
+                        from: "strategy_cryptos",
+                        localField: "_id",
+                        foreignField: "strategyId",
+                        pipeline: [
+                            { $match: {disabled: {$ne: true}} },
+                            { $project: { _id: 0, 'value': '$cryptoId' }},
+                            {
+                                $lookup: {
+                                    from: "cryptos",
+                                    localField: "value",
+                                    foreignField: "_id",
+                                    pipeline: [
+                                        { $project: { _id: 0, 'value': '$_id', 'label': '$name' } }
+                                    ],
+                                    as: "data"
+                                }
+                            }
+                        ],
+                        as: "crypto"
+                    }
+                },
+                { $project: {_id: 1, urlId: 1, name: 1, description: 1, percentage: 1, source: 1, crypto: "$crypto.data"} },
+                { $sort: {name: 1} },
+                { $skip: size * page },
+                { $limit: size }
+            ])
+
+            // const strategies = await Strategy.find({$and: [ {$or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}] }, {_id: {$nin: userStrategies}} ]})
+            //     .limit(size).skip(size * page).sort({
+            //         name: "asc"
+            //     })
 
             count = await Strategy.find({$and: [ {$or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}] }, {_id: {$nin: userStrategies}} ]})
                 .countDocuments()
@@ -307,7 +303,7 @@ router.get('/getStrategies', auth,
         }
     })
 
-// api/strategies/add
+// api/strategies/user/add
 router.post('/add', auth, [
         check('strategyId', 'Incorrect strategyId').notEmpty(),
         check('amount', 'Incorrect amount').notEmpty().isNumeric(),

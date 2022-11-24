@@ -81,7 +81,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
     useEffect(() => {
         setLoading(true)
-        if (title === "Strategies")
+        if (title === "Strategies" || title === "Add new strategy")
             getAllInputData()
         loadData(page, search)
     }, [])

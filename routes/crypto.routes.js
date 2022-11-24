@@ -5,6 +5,7 @@ const Binance = require('node-binance-api');
 const binance = new Binance();
 
 const Crypto = require('../models/Crypto')
+const StrategyCrypto = require('../models/Strategy_crypto')
 
 const router = Router();
 
@@ -74,10 +75,21 @@ router.get('/get', auth,
         }
     })
 
-// api/crypto/get
+// api/crypto/getAll
 router.get('/getAll', auth,
     async (req, res) => {
         try {
+
+            let strategyId = ''
+
+            if (req.query.strategyId) {
+                strategyId = req.query.strategyId
+                const crypto = await StrategyCrypto.find({ $and: [ {strategyId}, { disabled: false } ] }).populate('cryptoId', {_id: 0, value: '$_id', label: "$name"}).select({label: 1, value: 1, _id: 0})
+                let stCrypto = []
+                if (crypto)
+                    stCrypto = crypto.map(obj => obj.cryptoId)
+                return res.json(stCrypto)
+            }
 
             const crypto = await Crypto.aggregate([{ $project: {_id: 0, 'value': '$_id', label: '$name'} }])
 
