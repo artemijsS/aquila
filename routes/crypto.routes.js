@@ -1,5 +1,4 @@
 const { Router } = require('express')
-const { check, validationResult } = require('express-validator')
 const auth = require('../middleware/auth.middleware')
 const admin = require('../middleware/admin.middleware')
 const Binance = require('node-binance-api');
@@ -9,7 +8,7 @@ const Crypto = require('../models/Crypto')
 
 const router = Router();
 
-// api/crypto/new
+// api/crypto/updateBinanceCrypto
 router.post('/updateBinanceCrypto', auth, admin,
     async (req, res) => {
         try {
@@ -19,18 +18,27 @@ router.post('/updateBinanceCrypto', auth, admin,
             const symbolsObj = exchangeInfo.symbols.filter(obj => obj.symbol.match(regex))
             const symbols = symbolsObj.map(obj => {return { name: obj.symbol.split('USDT')[0], quantityPrecision: obj.quantityPrecision }})
 
+            let changesCount = 0
+
             for (const symbol of symbols) {
                 const candidate = await Crypto.findOne({ name: symbol.name })
                 if (!candidate) {
                     const crypto = new Crypto({ name: symbol.name, quantityPrecision: symbol.quantityPrecision })
                     await crypto.save()
+                    changesCount++
                 } else {
-                    candidate.quantityPrecision = symbol.quantityPrecision
-                    candidate.save()
+                    if (candidate.quantityPrecision !== symbol.quantityPrecision) {
+                        candidate.quantityPrecision = symbol.quantityPrecision
+                        await candidate.save()
+                        changesCount++
+                    }
                 }
             }
 
-            res.json('NICE')
+            if (changesCount === 0)
+                res.json("Binance do not have any crypto data updates yet!")
+            else
+                res.json(changesCount + " crypto successfully updated from Binance")
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
@@ -61,6 +69,19 @@ router.get('/get', auth,
             count = await Crypto.find({ name: {$regex: search, $options: 'i'}}).countDocuments()
 
             res.json({page: page, pages: Math.ceil(count/size), data: crypto})
+        } catch (e) {
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
+// api/crypto/get
+router.get('/getAll', auth,
+    async (req, res) => {
+        try {
+
+            const crypto = await Crypto.aggregate([{ $project: {_id: 0, 'value': '$_id', label: '$name'} }])
+
+            res.json(crypto)
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }

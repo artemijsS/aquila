@@ -251,6 +251,11 @@ code {
 .block .cards .card .info .data .value {
   flex: 1;
 }
+.block .cards .card .info .data .value .select {
+  margin-right: 10px;
+  margin-left: 10px;
+  width: 222px;
+}
 
 .block .cards .card.pulse {
   animation-name: pulse;
@@ -631,6 +636,10 @@ input {
 }
 input.red, textarea.red {
   border-bottom-color: red;
+}
+.select.red {
+  border-radius: 5px;
+  border: 1px solid red;
 }
 input:focus {
   border-bottom: 2px solid #1486f0;

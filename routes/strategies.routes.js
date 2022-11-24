@@ -5,8 +5,14 @@ const admin = require('../middleware/admin.middleware');
 
 const Strategy = require('../models/Strategy');
 const UserStrategies = require('../models/User_strategies');
+const StrategyCrypto = require('../models/Strategy_crypto');
 
 const router = Router();
+
+Array.prototype.diff = function(a)
+{
+    return this.filter(function(i) {return a.indexOf(i) < 0;});
+}
 
 // api/strategies/new
 router.post('/new', auth, admin, [
@@ -15,6 +21,7 @@ router.post('/new', auth, admin, [
         check('description', 'Incorrect description').notEmpty(),
         check('percentage', 'Incorrect percentage').notEmpty(),
         check('source', 'Incorrect source').notEmpty(),
+        check('crypto', 'Incorrect crypto').notEmpty().isArray()
     ],
     async (req, res) => {
         try {
@@ -28,8 +35,7 @@ router.post('/new', auth, admin, [
                 })
             }
 
-            const { urlId, name, description, percentage, source } = req.body;
-
+            const { urlId, name, description, percentage, source, crypto } = req.body;
             // urlId check
             let candidate = await Strategy.findOne({ urlId })
             if (candidate) {
@@ -49,6 +55,20 @@ router.post('/new', auth, admin, [
                 percentage,
                 source
             });
+
+            // crypto adding
+            for (let cr of crypto) {
+                try {
+                    const strategyCrypto = new StrategyCrypto({
+                        strategyId: strategy._id,
+                        cryptoId: cr.value
+                    })
+                    await strategyCrypto.save()
+                } catch (e) {
+                    console.log(e)
+                    return res.status(400).json({error: 2, value: "crypto"})
+                }
+            }
 
             await strategy.save();
 
@@ -75,10 +95,36 @@ router.get('/get', auth,
                 search = req.query.search
             }
 
-            const strategies = await Strategy.find({ $or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}] })
-                .limit(size).skip(size * page).sort({
-                name: "asc"
-            })
+            const strategies = await Strategy.aggregate([
+                { $match: { $or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}] } },
+                {
+                    $lookup: {
+                        from: "strategy_cryptos",
+                        localField: "_id",
+                        foreignField: "strategyId",
+                        pipeline: [
+                            { $match: {disabled: {$ne: true}} },
+                            { $project: { _id: 0, 'value': '$cryptoId' }},
+                            {
+                                $lookup: {
+                                    from: "cryptos",
+                                    localField: "value",
+                                    foreignField: "_id",
+                                    pipeline: [
+                                        { $project: { _id: 0, 'value': '$_id', 'label': '$name' } }
+                                    ],
+                                    as: "data"
+                                }
+                            }
+                        ],
+                        as: "crypto"
+                    }
+                },
+                { $project: {_id: 1, urlId: 1, name: 1, description: 1, percentage: 1, source: 1, crypto: "$crypto.data"} },
+                { $sort: {name: 1} },
+                { $skip: size * page },
+                { $limit: size }
+                ])
 
             count = await Strategy.find({ $or: [{urlId: {$regex: search, $options: 'i'}}, {name: {$regex: search, $options: 'i'}}] }).countDocuments()
 
@@ -99,6 +145,9 @@ router.delete('/delete', auth, admin,
             } else {
                 return res.status(400).json({error: 1, msg: "no urlId"})
             }
+            const strategy = await Strategy.findOne({urlId})
+
+            await StrategyCrypto.deleteMany({strategyId: strategy._id})
 
             await Strategy.deleteOne({ urlId })
 
@@ -114,6 +163,7 @@ router.post('/edit', auth, admin, [
         check('description', 'Incorrect description').notEmpty(),
         check('percentage', 'Incorrect percentage').notEmpty(),
         check('source', 'Incorrect source').notEmpty(),
+        check('crypto', 'Incorrect crypto').notEmpty().isArray(),
     ],
     async (req, res) => {
         try {
@@ -127,7 +177,7 @@ router.post('/edit', auth, admin, [
                 })
             }
 
-            const { urlId, description, percentage, source } = req.body;
+            const { urlId, description, percentage, source, crypto } = req.body;
 
             // urlId check
             let strategy = await Strategy.findOne({ urlId })
@@ -138,6 +188,42 @@ router.post('/edit', auth, admin, [
             strategy.description = description
             strategy.percentage = percentage
             strategy.source = source
+
+            // crypto adding
+            let cryptoIds = JSON.stringify(crypto.map(obj => obj.value))
+            let strategiesCrypto = await StrategyCrypto.find({ $and: [{strategyId: strategy._id}, {disabled: {$ne: true}}] }, ['cryptoId'])
+            strategiesCrypto = strategiesCrypto.map(obj => obj.cryptoId)
+            const toDelete = strategiesCrypto.diff(cryptoIds)
+            cryptoIds = JSON.parse(cryptoIds)
+            const toAdd = cryptoIds.diff(strategiesCrypto)
+
+            for (let cr of toDelete) {
+                try {
+                    const candidate = await StrategyCrypto.findOne({strategyId: strategy._id, cryptoId: cr})
+                    if (candidate) {
+                        candidate.disabled = true
+                        await candidate.save()
+                    }
+                } catch (e) {
+                    return res.status(400).json({error: 2, value: "crypto"})
+                }
+            }
+
+            for (let cr of toAdd) {
+                try {
+                    const candidate = await StrategyCrypto.findOne({ $and: [{strategyId: strategy._id}, {cryptoId: cr}] })
+                    if (!candidate) {
+                        const strategyCrypto = new StrategyCrypto({
+                            strategyId: strategy._id,
+                            cryptoId: cr
+                        })
+                        await strategyCrypto.save()
+                    }
+                } catch (e) {
+                    console.log(e)
+                    return res.status(400).json({error: 2, value: "crypto"})
+                }
+            }
 
             await strategy.save();
 

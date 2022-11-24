@@ -6,7 +6,7 @@ import axios from "axios";
 import { logoutUser } from "../../redux/actions/user";
 import { Search } from "../index";
 
-function Block ({title, objectForm, urlPath, children, newElement = true, list = false, update = false, updatePath = null}) {
+function Block ({title, objectForm, urlPath, children, newElement = true, list = false, update = false, updatePath = null, getAllInputPath = null}) {
 
     const dispatch = useDispatch()
 
@@ -15,6 +15,8 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
     const [data, setData] = useState([])
     const [page, setPage] = useState(0)
     const [pages, setPages] = useState(0)
+
+    const [allInputData, setAllInputData] = useState([])
 
     const [search, setSearch] = useState('')
 
@@ -36,7 +38,8 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
     const onDeleting = (id) => {
         setData([])
-        loadData(0, search)
+        console.log(1)
+        loadData(0, search, true)
     }
 
     const onSearchChange = (text) => {
@@ -47,10 +50,10 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
     const onUpdateData = () => {
         setLoading(true)
-        axios.post(process.env.REACT_APP_SERVER + `/api/${urlPath}/${updatePath}`, {},{headers: {authorization: `Bearer ${userData.token}`}}).then(_res => {
+        axios.post(process.env.REACT_APP_SERVER + `/api/${urlPath}/${updatePath}`, {},{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
             setData([])
             loadData(0, search, true)
-            toast.success("Crypto successfully updated from Binance")
+            toast.success(res.data)
         }, err => {
             if (err.response.status === 401) {
                 toast.warn("Authorization period expired")
@@ -61,7 +64,25 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
         })
     }
 
+    const getAllInputData = () => {
+        setLoading(true)
+        axios.get(process.env.REACT_APP_SERVER + `/api/${getAllInputPath}/getAll`,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+            setAllInputData(res.data)
+            setLoading(false)
+        }, err => {
+            if (err.response.status === 401) {
+                toast.warn("Authorization period expired")
+                dispatch(logoutUser())
+            }
+            toast.error("Error with loading all " + title + " data, try later")
+            setLoading(false)
+        })
+    }
+
     useEffect(() => {
+        setLoading(true)
+        if (title === "Strategies")
+            getAllInputData()
         loadData(page, search)
     }, [])
 
@@ -99,7 +120,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
                 }
 
                 {newDataCard &&
-                    React.cloneElement(children, { data: objectForm, editable: true, close: onCloseCreate, addNew: onAddNew })
+                    React.cloneElement(children, { data: objectForm, editable: true, close: onCloseCreate, addNew: onAddNew, allInputData: allInputData })
                 }
 
                 {!newDataCard && !loading && data.length === 0 &&
@@ -110,7 +131,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
                 {pages !== 0 && !newDataCard && !loading &&
                     data.map((obj, index) =>
-                        React.cloneElement(children, { data: obj, key: index, onDeleting:onDeleting })
+                        React.cloneElement(children, { data: obj, key: index, onDeleting:onDeleting, allInputData: allInputData })
                     )
                 }
             </div>

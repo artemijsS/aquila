@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react'
-import axios from "axios";
+import React, {useState, useRef, useEffect} from 'react'
+import axios from "axios"
+import Select from 'react-select'
+import makeAnimated from 'react-select/animated'
 import {toast} from "react-toastify";
 import {logoutUser} from "../../redux/actions/user";
 import {useDispatch, useSelector} from "react-redux";
 
-function AdminStrategyCard ({ data, editable = false, close = null, addNew = null, onDeleting = null, key = null }) {
+function AdminStrategyCard ({ data, allInputData, editable = false, close = null, addNew = null, onDeleting = null, key = null }) {
 
     const dispatch = useDispatch()
 
@@ -17,17 +19,21 @@ function AdminStrategyCard ({ data, editable = false, close = null, addNew = nul
         urlId: useRef(),
         source: useRef(),
         percentage: useRef(),
+        crypto: useRef(),
         description: useRef()
     }
 
     const [edit, setEdit] = useState(editable)
     const [dataForm, setDataForm] = useState(data)
+    const [cryptos, setCryptos] = useState(allInputData)
+    const animatedComponents = makeAnimated();
 
     const changeHandler = (event) => {
         setDataForm({ ...dataForm, [event.target.name]: event.target.value })
     }
 
     const onSave = (path) => {
+        console.log(dataForm)
         axios.post(process.env.REACT_APP_SERVER + "/api/strategies/" + path, dataForm,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
             if (path === "new") {
                 toast.success("New strategy added")
@@ -61,6 +67,9 @@ function AdminStrategyCard ({ data, editable = false, close = null, addNew = nul
                 })
                 inputRefs['urlId'].current.classList.remove('red')
                 inputRefs['name'].current.classList.remove('red')
+                inputRefs[err.response.data.value].current.classList.add('red')
+            } else if (err.response.data.error === 2) {
+                toast.warn("There is problem with crypto...")
                 inputRefs[err.response.data.value].current.classList.add('red')
             } else {
                 toast.error("Error, try one more time")
@@ -99,6 +108,10 @@ function AdminStrategyCard ({ data, editable = false, close = null, addNew = nul
     const onCloseEdit = () => {
         if (editError)
             setDataForm(data)
+        else {
+            let crypto = data.crypto.map(arr => arr[0])
+            setDataForm({...data, crypto})
+        }
         setEdit(false)
         setEditError(false)
     }
@@ -150,6 +163,22 @@ function AdminStrategyCard ({ data, editable = false, close = null, addNew = nul
                             :
                             dataForm.percentage
                         }
+                    </div>
+                </div>
+                <div className="data">
+                    <div className="key">Crypto</div>
+                    <div className="value">
+                        <div ref={inputRefs.crypto} className={edit ? "select" : ""}>
+                            <Select
+                                closeMenuOnSelect={false}
+                                isDisabled={!edit}
+                                components={animatedComponents}
+                                defaultValue={() => dataForm.crypto.map(arr => arr[0])}
+                                isMulti
+                                options={cryptos}
+                                onChange={(crypto) => setDataForm({...dataForm, crypto: crypto})}
+                            />
+                        </div>
                     </div>
                 </div>
                 <div className="data">
