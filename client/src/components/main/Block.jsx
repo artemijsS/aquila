@@ -84,7 +84,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
     useEffect(() => {
         setLoading(true)
-        if (title === "Strategies" || title === "Add new strategy") {
+        if (title === "Strategies" || title === "Add new strategy" || title === "My strategies") {
             loadDataConcurrently()
         } else {
             loadData(page, search)

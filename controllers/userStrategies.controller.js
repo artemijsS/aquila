@@ -4,7 +4,67 @@ const Strategy = require('../models/Strategy');
 const UserStrategies = require('../models/User_strategies');
 const UserStrategiesCrypto = require('../models/User_strategies_crypto');
 
+const userStrategiesCrypto = require('../controllers/userStrategiesCrypto.controller')
+const usrStrCrContr = new userStrategiesCrypto
+
 module.exports = class userStrategies {
+
+    async add(userId, strategyId, amount, leverage, crypto) {
+        const candidate = await UserStrategies.find({ $and: [{strategyId: strategyId}, {userId: userId}] })
+        if (candidate.length !== 0) {
+            return { message: "Strategy already added" }
+        }
+
+        if (amount < 5) {
+            return { error: 1, msg: "Amount must be >= 5" }
+        }
+        if (leverage < 1 || leverage > 50) {
+            return { error: 1, msg: "Leverage must be from 1 till 50" }
+        }
+
+        const userStrategies = UserStrategies({
+            userId,
+            strategyId,
+            disabled: false,
+            amount,
+            leverage
+        })
+
+        const userStrategyCrypto = await usrStrCrContr.add(userStrategies._id, crypto)
+        if (!userStrategyCrypto) {
+            return {error: 1, msg: "Problems with all crypto save"}
+        }
+
+        await userStrategies.save()
+
+        return userStrategies
+    }
+
+    async edit(userStrategyId, amount, leverage, crypto) {
+        const userStrategies = await UserStrategies.findOne({ _id: userStrategyId })
+        if (!userStrategies) {
+            return { message: "Strategy does not exist" }
+        }
+
+        if (amount < 5) {
+            return { error: 1, msg: "Amount must be >= 5" }
+        }
+        if (leverage < 1 || leverage > 50) {
+            return { error: 1, msg: "Leverage must be from 1 till 50" }
+        }
+
+        userStrategies.amount = amount
+        userStrategies.leverage = leverage
+
+        const strategyCrypto = await usrStrCrContr.edit(userStrategyId, crypto)
+        if (!strategyCrypto) {
+            return {error: 2, value: "crypto"}
+        }
+
+        await userStrategies.save()
+
+        return userStrategies
+    }
 
     async get(userId, size, page, search) {
         return UserStrategiesCrypto.aggregate([
@@ -52,9 +112,11 @@ module.exports = class userStrategies {
                     as: "strategy"
                 }
             },
-            {$project: {_id: 1, strategy: "$strategy.data", crypto: 1}},
+            {$project: {_id: 1, strategy: "$strategy.data", crypto: 1, leverage: "$strategy.leverage", amount: "$strategy.amount"}},
             {$unwind: "$strategy"},
             {$unwind: "$strategy"},
+            {$unwind: "$amount"},
+            {$unwind: "$leverage"},
             {
                 $project: {
                     _id: 1,
@@ -64,6 +126,9 @@ module.exports = class userStrategies {
                     percentage: "$strategy.percentage",
                     source: "$strategy.source",
                     rating: "$strategy.rating",
+                    strategyId: "$strategy._id",
+                    leverage: 1,
+                    amount: 1,
                     crypto: 1
                 }
             },

@@ -126,7 +126,8 @@ module.exports = class strategies {
                                 ],
                                 as: "data"
                             }
-                        }
+                        },
+                        { $unwind: "$data" },
                     ],
                     as: "crypto"
                 }

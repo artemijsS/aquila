@@ -41,11 +41,16 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
         console.log('delete')
     }
 
-    const onAdd = () => {
-        axios.post(process.env.REACT_APP_SERVER + `/api/userStrategies/add`, {crypto: strategy.crypto, amount: strategy.amount, leverage: strategy.leverage, strategyId: strategy._id},
+    const onAdd = (path) => {
+        axios.post(process.env.REACT_APP_SERVER + `/api/userStrategies/${path}`, {userStrategyId: strategy._id, crypto: strategy.crypto, amount: strategy.amount, leverage: strategy.leverage, strategyId: strategy._id},
             {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
-            onDeleting()
-            toast.success('Strategy successfully added!')
+                if (path === "add") {
+                    onDeleting()
+                    toast.success('Strategy successfully added!')
+                } else {
+                    toast.success('Strategy successfully edited!')
+                    setEdit(false)
+                }
         }, err => {
             if (err.response.status === 401) {
                 toast.warn("Authorization period expired")
@@ -66,9 +71,18 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
         })
     }
 
+    // const onEditEdit = () => {
+    //     console.log("edit")
+    //     console.log(strategy)
+    // }
+
+
     useEffect(() => {
-        axios.get(process.env.REACT_APP_SERVER + `/api/crypto/getAll?strategyId=${strategy._id}`,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
-            setStrategy({...strategy, crypto: res.data})
+        console.log(strategy)
+        let id = strategy._id
+        if (own)
+            id = strategy.strategyId
+        axios.get(process.env.REACT_APP_SERVER + `/api/crypto/getAll?strategyId=${id}`,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
             setCryptos(res.data)
         }, err => {
             if (err.response.status === 401) {
@@ -106,7 +120,7 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
                                 closeMenuOnSelect={false}
                                 isDisabled={!edit}
                                 components={animatedComponents}
-                                defaultValue={() => strategy.crypto.map(arr => arr[0])}
+                                defaultValue={() => strategy.crypto}
                                 isMulti
                                 options={cryptos}
                                 onChange={(crypto) => setStrategy({...strategy, crypto: crypto})}
@@ -118,7 +132,7 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
                     <div className="data">
                         <div className="key">Amount in $</div>
                         <div className="value">
-                            <input ref={inputRefs.amount} onChange={changeHandler} name="amount" type="number"/>
+                            <input ref={inputRefs.amount} defaultValue={strategy.amount} onChange={changeHandler} disabled={!edit} name="amount" type="number"/>
                         </div>
                     </div>
                 }
@@ -126,7 +140,7 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
                 <div className="data">
                     <div className="key">Leverage</div>
                     <div className="value">
-                        <input ref={inputRefs.leverage} onChange={changeHandler} name="leverage" type="number"/>
+                        <input ref={inputRefs.leverage} defaultValue={strategy.leverage} onChange={changeHandler} disabled={!edit} name="leverage" type="number"/>
                     </div>
                 </div>
                 }
@@ -138,7 +152,7 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
             {ownAdd && edit &&
                 <div className="down">
                     <button onClick={() => onCloseEdit()}>Cancel</button>
-                    <button onClick={() => onEdit("edit")} className="save">Save</button>
+                    <button onClick={() => onAdd("edit")} className="save">Save</button>
                 </div>
             }
             {ownAdd && !edit &&
@@ -154,7 +168,7 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
             {!ownAdd && edit &&
                 <div className="down">
                     <button onClick={() => onCloseEdit()}>Cancel</button>
-                    <button onClick={() => onAdd("edit")} className="save">Add</button>
+                    <button onClick={() => onAdd("add")} className="save">Add</button>
                 </div>
             }
         </div>
