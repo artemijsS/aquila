@@ -17,6 +17,9 @@ function StrategiesPage () {
             <div className="wrapper full-screen">
                 <Navigation activeRoute="strategies"/>
                 <div className="main-window">
+                    <Block title={"My strategies"} own={true} newElement={false} objectForm={{urlId: '', name: '', description: '', percentage: '', source: '', crypto: []}} urlPath={"userStrategies"}>
+                        <StrategyCard/>
+                    </Block>
                     <Block title={"Add new strategy"} newElement={false} objectForm={{urlId: '', name: '', description: '', percentage: '', source: '', crypto: []}} urlPath={"strategies/user"}>
                         <StrategyCard/>
                     </Block>

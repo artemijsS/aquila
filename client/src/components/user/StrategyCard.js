@@ -6,7 +6,7 @@ import axios from "axios";
 import {toast} from "react-toastify";
 import {logoutUser} from "../../redux/actions/user";
 
-function StrategyCard ({ data, key = null, own = false }) {
+function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
 
     const dispatch = useDispatch()
 
@@ -19,7 +19,8 @@ function StrategyCard ({ data, key = null, own = false }) {
 
     const inputRefs = {
         amount: useRef(),
-        crypto: useRef()
+        crypto: useRef(),
+        leverage: useRef()
     }
 
     const animatedComponents = makeAnimated();
@@ -30,21 +31,44 @@ function StrategyCard ({ data, key = null, own = false }) {
 
     const onCloseEdit = () => {
         setEdit(false)
-        console.log('close')
     }
 
     const onEdit = () => {
         setEdit(true)
-        console.log('edit')
     }
 
     const onDelete = (id) => {
         console.log('delete')
     }
 
+    const onAdd = () => {
+        axios.post(process.env.REACT_APP_SERVER + `/api/userStrategies/add`, {crypto: strategy.crypto, amount: strategy.amount, leverage: strategy.leverage, strategyId: strategy._id},
+            {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+            onDeleting()
+            toast.success('Strategy successfully added!')
+        }, err => {
+            if (err.response.status === 401) {
+                toast.warn("Authorization period expired")
+                dispatch(logoutUser())
+            } else if (err.response.data.errors) {
+                toast.error("Please fill all required fields")
+                Object.keys(inputRefs).forEach(key => {
+                    inputRefs[key].current.classList.remove('red')
+                })
+                err.response.data.errors.forEach(er =>
+                    inputRefs[er.param].current.classList.add('red')
+                )
+            } else if (err.response.data.error === 1) {
+                toast.warn(err.response.data.msg)
+            } else {
+                toast.error("Error, try one more time")
+            }
+        })
+    }
+
     useEffect(() => {
         axios.get(process.env.REACT_APP_SERVER + `/api/crypto/getAll?strategyId=${strategy._id}`,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
-            console.log(res.data)
+            setStrategy({...strategy, crypto: res.data})
             setCryptos(res.data)
         }, err => {
             if (err.response.status === 401) {
@@ -90,13 +114,21 @@ function StrategyCard ({ data, key = null, own = false }) {
                         </div>
                     </div>
                 </div>
-                {edit &&
+                {(edit || ownAdd) &&
                     <div className="data">
                         <div className="key">Amount in $</div>
                         <div className="value">
                             <input ref={inputRefs.amount} onChange={changeHandler} name="amount" type="number"/>
                         </div>
                     </div>
+                }
+                {(edit || ownAdd) &&
+                <div className="data">
+                    <div className="key">Leverage</div>
+                    <div className="value">
+                        <input ref={inputRefs.leverage} onChange={changeHandler} name="leverage" type="number"/>
+                    </div>
+                </div>
                 }
                 <div className="data">
                     <div className="key">Description</div>
@@ -122,7 +154,7 @@ function StrategyCard ({ data, key = null, own = false }) {
             {!ownAdd && edit &&
                 <div className="down">
                     <button onClick={() => onCloseEdit()}>Cancel</button>
-                    <button onClick={() => onEdit("edit")} className="save">Add</button>
+                    <button onClick={() => onAdd("edit")} className="save">Add</button>
                 </div>
             }
         </div>

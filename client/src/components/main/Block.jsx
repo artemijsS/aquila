@@ -6,7 +6,7 @@ import axios from "axios";
 import { logoutUser } from "../../redux/actions/user";
 import { Search } from "../index";
 
-function Block ({title, objectForm, urlPath, children, newElement = true, list = false, update = false, updatePath = null, getAllInputPath = null}) {
+function Block ({title, objectForm, urlPath, children, newElement = true, list = false, update = false, updatePath = null, getAllInputPath = null, own = false}) {
 
     const dispatch = useDispatch()
 
@@ -33,12 +33,11 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
     const onAddNew = (obj) => {
         setData([])
-        loadData(0, search)
+        loadData(0, search, true)
     }
 
     const onDeleting = (id) => {
         setData([])
-        console.log(1)
         loadData(0, search, true)
     }
 
@@ -64,6 +63,10 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
         })
     }
 
+    const loadDataConcurrently = async ()  => {
+        return await Promise.all([loadData(page, search), getAllInputData()])
+    }
+
     const getAllInputData = () => {
         setLoading(true)
         axios.get(process.env.REACT_APP_SERVER + `/api/${getAllInputPath}/getAll`,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
@@ -81,9 +84,11 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
     useEffect(() => {
         setLoading(true)
-        if (title === "Strategies" || title === "Add new strategy")
-            getAllInputData()
-        loadData(page, search)
+        if (title === "Strategies" || title === "Add new strategy") {
+            loadDataConcurrently()
+        } else {
+            loadData(page, search)
+        }
     }, [])
 
     const loadData = (page, search, reset = false) => {
@@ -131,7 +136,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
                 {pages !== 0 && !newDataCard && !loading &&
                     data.map((obj, index) =>
-                        React.cloneElement(children, { data: obj, key: index, onDeleting:onDeleting, allInputData: allInputData })
+                        React.cloneElement(children, { data: obj, key: index, onDeleting:onDeleting, allInputData: allInputData, own: own })
                     )
                 }
             </div>

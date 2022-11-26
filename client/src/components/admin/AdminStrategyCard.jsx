@@ -33,7 +33,6 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
     }
 
     const onSave = (path) => {
-        console.log(dataForm)
         axios.post(process.env.REACT_APP_SERVER + "/api/strategies/" + path, dataForm,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
             if (path === "new") {
                 toast.success("New strategy added")
@@ -108,10 +107,6 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
     const onCloseEdit = () => {
         if (editError)
             setDataForm(data)
-        else {
-            let crypto = data.crypto.map(arr => arr[0])
-            setDataForm({...data, crypto})
-        }
         setEdit(false)
         setEditError(false)
     }
@@ -173,7 +168,7 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
                                 closeMenuOnSelect={false}
                                 isDisabled={!edit}
                                 components={animatedComponents}
-                                defaultValue={() => dataForm.crypto.map(arr => arr[0])}
+                                defaultValue={dataForm.crypto}
                                 isMulti
                                 options={cryptos}
                                 onChange={(crypto) => setDataForm({...dataForm, crypto: crypto})}
