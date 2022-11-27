@@ -150,6 +150,7 @@ module.exports = class userStrategies {
                     as: "data"
                 }
             },
+            { $match: {data: { $ne: [] }} },
             { $count: "count" }
         ]).then(count => count[0].count)
     }

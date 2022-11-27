@@ -71,14 +71,7 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
         })
     }
 
-    // const onEditEdit = () => {
-    //     console.log("edit")
-    //     console.log(strategy)
-    // }
-
-
     useEffect(() => {
-        console.log(strategy)
         let id = strategy._id
         if (own)
             id = strategy.strategyId
