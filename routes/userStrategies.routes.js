@@ -69,7 +69,29 @@ router.post('/edit', auth, [
             const userId = req.user.userId
             const { userStrategyId, amount, leverage, crypto } = req.body;
 
-            const userStrategies = await userStrContr.edit(userStrategyId, amount, leverage, crypto)
+            const userStrategies = await userStrContr.edit(userId, userStrategyId, amount, leverage, crypto)
+            if (userStrategies.error) {
+                return res.status(400).json(userStrategies)
+            }
+
+            res.json({userStrategies})
+        } catch (e) {
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
+// api/userStrategies/disable
+router.post('/disable', auth, [
+        check('userStrategyId', 'Incorrect strategyId').notEmpty()
+    ],
+    validation,
+    async (req, res) => {
+        try {
+
+            const userId = req.user.userId
+            const { userStrategyId } = req.body;
+
+            const userStrategies = await userStrContr.disable(userId, userStrategyId)
             if (userStrategies.error) {
                 return res.status(400).json(userStrategies)
             }

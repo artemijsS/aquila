@@ -10,9 +10,9 @@ const usrStrCrContr = new userStrategiesCrypto
 module.exports = class userStrategies {
 
     async add(userId, strategyId, amount, leverage, crypto) {
-        const candidate = await UserStrategies.find({ $and: [{strategyId: strategyId}, {userId: userId}] })
-        if (candidate.length !== 0) {
-            return { message: "Strategy already added" }
+        const candidate = await UserStrategies.findOne({ $and: [{strategyId: strategyId}, {userId: userId}] })
+        if (candidate.disabled === false) {
+            return { error: 1, msg: "Strategy already added" }
         }
 
         if (amount < 5) {
@@ -20,6 +20,18 @@ module.exports = class userStrategies {
         }
         if (leverage < 1 || leverage > 50) {
             return { error: 1, msg: "Leverage must be from 1 till 50" }
+        }
+
+        if (candidate) {
+            candidate.amount = amount
+            candidate.leverage = leverage
+            candidate.disabled = false
+            const userStrategyCrypto = await usrStrCrContr.edit(candidate._id, crypto)
+            if (!userStrategyCrypto) {
+                return {error: 1, msg: "Problems with all crypto save"}
+            }
+            await candidate.save()
+            return candidate
         }
 
         const userStrategies = UserStrategies({
@@ -40,8 +52,8 @@ module.exports = class userStrategies {
         return userStrategies
     }
 
-    async edit(userStrategyId, amount, leverage, crypto) {
-        const userStrategies = await UserStrategies.findOne({ _id: userStrategyId })
+    async edit(userId, userStrategyId, amount, leverage, crypto) {
+        const userStrategies = await UserStrategies.findOne({ _id: userStrategyId, userId: userId })
         if (!userStrategies) {
             return { message: "Strategy does not exist" }
         }
@@ -64,6 +76,19 @@ module.exports = class userStrategies {
         await userStrategies.save()
 
         return userStrategies
+    }
+
+    async disable(userId, userStrategyId) {
+        const userStrategy = await UserStrategies.findOne({ _id: userStrategyId, userId: userId })
+        if (!userStrategy) {
+            return {error: 1, msg: "Strategy does not exist"}
+        }
+
+        userStrategy.disabled = true
+
+        await userStrategy.save()
+
+        return userStrategy
     }
 
     async get(userId, size, page, search) {

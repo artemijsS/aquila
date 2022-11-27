@@ -37,8 +37,26 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
         setEdit(true)
     }
 
-    const onDelete = (id) => {
-        console.log('delete')
+    const onDelete = () => {
+        if (window.confirm('Are you sure you want to delete ' + strategy.name + '?')) {
+            console.log(strategy._id)
+            axios.post(process.env.REACT_APP_SERVER + `/api/userStrategies/disable`, {userStrategyId: strategy._id}, {headers: {authorization: `Bearer ${userData.token}`}})
+                .then(_res => {
+                    onDeleting()
+                    toast.success('Strategy successfully deleted!')
+                }, err => {
+                    if (err.response.status === 401) {
+                        toast.warn("Authorization period expired")
+                        dispatch(logoutUser())
+                    } else if (err.response.data.errors) {
+                        toast.error("Problems with data")
+                    } else if (err.response.data.error === 1) {
+                        toast.warn(err.response.data.msg)
+                    } else {
+                        toast.error("Error, try one more time")
+                    }
+                })
+        }
     }
 
     const onAdd = (path) => {
@@ -150,6 +168,7 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
             }
             {ownAdd && !edit &&
                 <div className="down">
+                    <svg onClick={() => onDelete()} className="delete" width="30" height="30" viewBox="0 0 400 480" xmlns="http://www.w3.org/2000/svg" ><title>delete</title><path d="M100 400l200 0q8 0 14-6 6-6 6-14l0-200 40 0 0-40-80 0 0-40q0-8-6-14-6-6-14-6l-120 0q-8 0-14 6-6 6-6 14l0 40-80 0 0 40 40 0 0 200q0 8 6 14 6 6 14 6l0 0z m20-40l0-160 60 0 0 160-60 0z m40-200l0-40 80 0 0 40-80 0z m60 200l0-160 60 0 0 160-60 0z" /></svg>
                     <svg onClick={() => onEdit()} className="edit" width="30" height="30" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" ><title>edit</title><path d="M200 360l150-150-80-80-150 150 80 80z m-140 60l110-30-80-80-30 110z m240-320l80 80 50-50-80-80-50 50z" /></svg>
                 </div>
             }

@@ -103,7 +103,7 @@ module.exports = class strategies {
 
 
     async getStrategiesForUser(userId, size, page, search) {
-        const userStrategiesTmp = await UserStrategies.find({ userId: userId }).select('strategyId')
+        const userStrategiesTmp = await UserStrategies.find({ userId: userId, disabled: false }).select('strategyId')
         const userStrategies = userStrategiesTmp.map(obj => obj.strategyId)
 
         return Strategy.aggregate([
