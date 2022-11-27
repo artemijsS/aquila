@@ -21,6 +21,8 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
             setDataForm({ ...dataForm, disabled: !dataForm.disabled })
         } else if (event.target.name === "twoFAuthentication") {
             setDataForm({...dataForm, twoFAuthentication: !dataForm.twoFAuthentication})
+        } else if (event.target.name === "notifications") {
+            setDataForm({...dataForm, notifications: !dataForm.notifications})
         } else {
             setDataForm({...dataForm, [event.target.name]: event.target.value})
         }
@@ -53,7 +55,7 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
     const onDelete = (id) => {
         loading(true)
         if (window.confirm('Are you sure you want to delete ' + id + '?')) {
-            axios.delete(process.env.REACT_APP_SERVER + `/api/user/delete?telegram_username=${id}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(_res => {
+            axios.delete(process.env.REACT_APP_SERVER + `/api/user/admin/delete?telegram_username=${id}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(_res => {
                 toast.success("User " + id + " deleted")
                 onDeleting(id)
                 cardRef.current.classList.add('delete')
@@ -130,13 +132,12 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
                     </div>
                 </div>
                 <div className="data">
-                    <div className="key">Description</div>
+                    <div className="key">notifications</div>
                     <div className="value">
-                        {edit ?
-                            <textarea defaultValue={dataForm.description} onChange={changeHandler} name="description" />
-                            :
-                            dataForm.description
-                        }
+                        <div className="toggle-pill-color">
+                            <input disabled={!edit} type="checkbox" id={"pillDisNotifications" + dataForm.telegram_username} name="notifications" onChange={changeHandler} defaultChecked={dataForm.notifications}/>
+                            <label htmlFor={"pillDisNotifications" + dataForm.telegram_username}/>
+                        </div>
                     </div>
                 </div>
             </div>

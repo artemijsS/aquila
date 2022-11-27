@@ -3,12 +3,15 @@ const { check, validationResult } = require('express-validator')
 const auth = require('../middleware/auth.middleware');
 const admin = require('../middleware/admin.middleware');
 
+const userController = require('../controllers/user.controller')
+const usrContr = new userController
+
 const User = require('../models/User');
 
 const router = Router();
 
 // api/user/get
-router.get('/get', auth, admin,
+router.get('/admin/get', auth, admin,
     async (req, res) => {
         try {
 
@@ -28,7 +31,7 @@ router.get('/get', auth, admin,
                     {telegram_chatId: {$regex: search, $options: 'i'}},
                     {role: {$regex: search, $options: 'i'}}
                 ] })
-                .select(['telegram_username', 'telegram_chatId', 'role', 'twoFAuthentication', 'description', 'disabled'])
+                .select(['telegram_username', 'telegram_chatId', 'role', 'twoFAuthentication', 'disabled', 'notifications'])
                 .limit(size).skip(size * page).sort({
                 telegram_username: "asc"
             })
@@ -44,8 +47,8 @@ router.get('/get', auth, admin,
         }
     })
 
-// api/strategies/delete
-router.delete('/delete', auth, admin,
+// api/user/delete
+router.delete('/admin/delete', auth, admin,
     async (req, res) => {
         try {
             let telegram_username
@@ -69,6 +72,7 @@ router.post('/adminEdit', auth, admin, [
         check('telegram_username', 'Incorrect telegram_username').notEmpty(),
         check('role', 'Incorrect role').notEmpty(),
         check('disabled', 'Incorrect disabled').notEmpty(),
+        check('notifications', 'Incorrect disabled').notEmpty(),
         check('twoFAuthentication', 'Incorrect twoFAuthentication').notEmpty(),
     ],
     async (req, res) => {
@@ -83,7 +87,7 @@ router.post('/adminEdit', auth, admin, [
                 })
             }
 
-            const { telegram_username, role, twoFAuthentication, description, disabled } = req.body;
+            const { telegram_username, role, twoFAuthentication, disabled, notifications } = req.body;
 
             // telegram_username check
             let user = await User.findOne({ telegram_username })
@@ -105,12 +109,30 @@ router.post('/adminEdit', auth, admin, [
 
             user.role = role
             user.twoFAuthentication = twoFAuthentication
-            user.description = description
             user.disabled = disabled
+            user.notifications = notifications
 
             await user.save();
 
-            res.json({user: { telegram_chatId: user.telegram_chatId, telegram_username, role, twoFAuthentication, description, disabled: user.disabled }})
+            res.json({user: { telegram_chatId: user.telegram_chatId, telegram_username, role, twoFAuthentication, disabled: user.disabled }})
+        } catch (e) {
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
+// api/user/get
+router.get('/get', auth,
+    async (req, res) => {
+        try {
+
+            const userId = req.user.userId
+            console.log(userId)
+            const user = await usrContr.get(userId)
+            if (!user) {
+                return res.status(400).json({error: 1, msg: "User not found"})
+            }
+
+            res.json(user)
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }

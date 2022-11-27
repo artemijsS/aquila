@@ -22,7 +22,7 @@ function AdminPage () {
                     <Block title={"Strategies"} objectForm={{urlId: '', name: '', description: '', percentage: '', source: '', crypto: []}} urlPath={"strategies"} getAllInputPath={"crypto"}>
                         <AdminStrategyCard/>
                     </Block>
-                    <Block title={"Users"} objectForm={{telegram_username: '', telegram_chatId: '', role: '', description: '', twoFAuthentication: '', disabled: ''}} urlPath={"user"} newElement={false}>
+                    <Block title={"Users"} objectForm={{telegram_username: '', telegram_chatId: '', role: '', twoFAuthentication: '', disabled: '', notifications: ''}} urlPath={"user/admin"} newElement={false}>
                         <AdminUserCard/>
                     </Block>
                     <Block title={"User invitations"} objectForm={{telegram_username: ''}} urlPath={"userNew"} list={true}>
