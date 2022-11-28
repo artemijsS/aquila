@@ -2,6 +2,8 @@ const { Router } = require('express');
 const { check, validationResult } = require('express-validator')
 const auth = require('../middleware/auth.middleware');
 const admin = require('../middleware/admin.middleware');
+const validation = require('../middleware/validation.middleware');
+const _2FA = require('../middleware/_2FA.middleware');
 
 const userController = require('../controllers/user.controller')
 const usrContr = new userController
@@ -126,13 +128,67 @@ router.get('/get', auth,
         try {
 
             const userId = req.user.userId
-            console.log(userId)
+
             const user = await usrContr.get(userId)
             if (!user) {
                 return res.status(400).json({error: 1, msg: "User not found"})
             }
 
             res.json(user)
+        } catch (e) {
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
+// api/user/updateTwoFAuthentication
+router.post('/updateTwoFAuthentication', auth, _2FA, [
+        check('twoFAuthentication', 'Incorrect twoFAuthentication').notEmpty().isBoolean(),
+    ],
+    validation,
+    async (req, res) => {
+        try {
+
+            const userId = req.user.userId
+            const { twoFAuthentication } = req.body
+            await usrContr.updateTwoFAuthentication(userId, twoFAuthentication)
+
+            res.json({msg: "2FA successfully updated"})
+        } catch (e) {
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
+// api/user/updateTwoFAuthentication
+router.post('/updateNotifications', auth, [
+        check('notifications', 'Incorrect notifications').notEmpty().isBoolean(),
+    ],
+    validation,
+    async (req, res) => {
+        try {
+
+            const userId = req.user.userId
+            const { notifications } = req.body
+            await usrContr.updateNotifications(userId, notifications)
+
+            res.json({msg: "Notifications successfully updated"})
+        } catch (e) {
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
+// api/user/updateBinanceApiKey
+router.post('/updateBinanceApiKey', auth, _2FA, [
+        check('BINANCE_API_KEY', 'Incorrect BINANCE_API_KEY').notEmpty().isString(),
+    ],
+    validation,
+    async (req, res) => {
+        try {
+
+            // const userId = req.user.userId
+            // const { notifications } = req.body
+            // await usrContr.updateNotifications(userId, notifications)
+
+            res.json({msg: "Notifications successfully updated"})
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }

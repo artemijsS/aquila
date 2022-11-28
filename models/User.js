@@ -10,6 +10,7 @@ const schema = new Schema({
     last_time_seen: {type: String},
     twoFAuthentication: {type: Boolean, default: false},
     twoFAuthenticationCodeToken: {type: String},
+    twoFAuthenticationConfirm: {type: String},
     disabled: {type: Boolean, default: false},
     notifications: {type: Boolean, default: false}
 })

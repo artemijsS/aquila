@@ -3,6 +3,11 @@ const { check, validationResult } = require('express-validator')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { bot } = require('../telegram/telegram')
+const auth = require('../middleware/auth.middleware')
+const validation = require('../middleware/validation.middleware')
+
+const _2FAController = require('../controllers/_2FA.controller')
+const _2FAContr = new _2FAController
 
 const User = require('../models/User');
 const UserInvite = require('../models/User_invite');
@@ -239,7 +244,7 @@ router.post('/2FA',
         }
     })
 
-// api/auth/2FA
+// api/auth/2FAGenerate
 router.post('/2FAGenerate',
     [
         check('token', 'Incorrect token').notEmpty()
@@ -283,6 +288,28 @@ router.post('/2FAGenerate',
             await user.save()
 
             await bot.sendMessage(user.telegram_chatId, "code - " + code)
+
+        } catch (e) {
+            res.status(500).json({ message: "Error" })
+        }
+    })
+
+// api/auth/2FAConfirm
+router.post('/2FAConfirm', auth,
+    [
+        check('code', 'Incorrect code').notEmpty().isLength({min: 4, max:4})
+    ],
+    validation,
+    async (req, res) => {
+
+        try {
+
+            const { code } = req.body;
+            const userId = req.user.userId
+
+            const [status, message] = await _2FAContr.checkToken(userId, code)
+
+            return res.status(status).json(message)
 
         } catch (e) {
             res.status(500).json({ message: "Error" })

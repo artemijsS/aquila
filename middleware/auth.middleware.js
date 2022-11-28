@@ -17,6 +17,6 @@ module.exports = (req, res, next) => {
         next();
 
     } catch (e) {
-        res.status(401).json({ message: 'No auth' })
+        return res.status(401).json({ message: 'No auth' })
     }
 }

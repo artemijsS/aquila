@@ -738,6 +738,24 @@ textarea:focus {
   box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.2);
   left: 1.6em;
 }
+/*loadingON*/
+.toggle-pill-color input[type="checkbox"]:checked.loadingOn + label:before {
+  opacity: 0.5;
+  left: 1.2em !important;
+}
+.toggle-pill-color input[type="checkbox"]:checked.loadingOn + label {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+/*loadingOFF*/
+.toggle-pill-color input[type="checkbox"].loadingOff + label:before {
+  opacity: 0.5;
+  left: 0.6em !important;
+}
+.toggle-pill-color input[type="checkbox"].loadingOff + label {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
 .toggle-pill-color input[disabled] + label {
   cursor: not-allowed;
 }

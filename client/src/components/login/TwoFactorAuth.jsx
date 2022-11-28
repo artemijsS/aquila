@@ -3,10 +3,10 @@ import './TwoFactorAuth.css'
 import logo from "../../assets/logo.png";
 import {useDispatch, useSelector} from "react-redux";
 import axios from "axios";
-import {set2FA, TwoFA} from "../../redux/actions/user";
+import {logoutUser, set2FA, TwoFA} from "../../redux/actions/user";
 import { toast } from "react-toastify";
 
-function TwoFactorAuth () {
+function TwoFactorAuth ({confirm = false, onConfirm = null}) {
 
     const dispatch = useDispatch()
 
@@ -22,7 +22,8 @@ function TwoFactorAuth () {
     }
 
     useEffect(() => {
-        axios.post(process.env.REACT_APP_SERVER + "/api/auth/2FAGenerate", {token: userData.token})
+        if (!confirm)
+            axios.post(process.env.REACT_APP_SERVER + "/api/auth/2FAGenerate", {token: userData.token})
     }, [])
 
     const onSubmit = (e) => {
@@ -37,17 +38,34 @@ function TwoFactorAuth () {
             Object.keys(inputs).map((key, index) => {
                 code = code + inputs[index + 1].current.value
             })
-            dispatch(TwoFA(userData.telegram_username, code)).then(res => {
-                if (res === "error") {
-                    dispatch(set2FA(false))
-                    toast.error('Incorrect code, try one more time');
-                } else if (res === "TL") {
-                    dispatch(set2FA(false))
-                    toast.warn('Time limit exceeded')
-                } else {
-                    toast.success('Hello =)')
-                }
-            })
+            if (confirm) {
+                axios.post(process.env.REACT_APP_SERVER + "/api/auth/2FAConfirm", {code}, {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+                    onConfirm()
+                    toast.success(res.data.message)
+                }, err => {
+                    if (err.response.status === 401) {
+                        toast.warn("Authorization period expired")
+                        dispatch(logoutUser())
+                        return
+                    }
+                    if (err.response.status === 203) {
+                        onConfirm()
+                    }
+                    toast.error(err.response.data.message)
+                })
+            } else {
+                dispatch(TwoFA(userData.telegram_username, code)).then(res => {
+                    if (res === "error") {
+                        dispatch(set2FA(false))
+                        toast.error('Incorrect code, try one more time');
+                    } else if (res === "TL") {
+                        dispatch(set2FA(false))
+                        toast.warn('Time limit exceeded')
+                    } else {
+                        toast.success('Hello =)')
+                    }
+                })
+            }
         }
         if (val > 1) {
             e.target.value = e.target.value.slice(0,1)
