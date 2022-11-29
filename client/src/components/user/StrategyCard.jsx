@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import axios from "axios";
 import {toast} from "react-toastify";
 import {logoutUser} from "../../redux/actions/user";
+import {updateAllStrategies, updateMyStrategies} from "../../redux/actions/updates";
 
 function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
 
@@ -34,16 +35,24 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
     }
 
     const onEdit = () => {
+        if (userData.disabledActionsBinance) {
+            toast.warn("You need add Binance API key and API secret first in settings!")
+            return
+        }
         setEdit(true)
     }
 
     const onDelete = () => {
+        if (userData.disabledActionsBinance) {
+            toast.warn("You need add Binance API key and API secret first in settings!")
+            return
+        }
         if (window.confirm('Are you sure you want to delete ' + strategy.name + '?')) {
-            console.log(strategy._id)
             axios.post(process.env.REACT_APP_SERVER + `/api/userStrategies/disable`, {userStrategyId: strategy._id}, {headers: {authorization: `Bearer ${userData.token}`}})
                 .then(_res => {
                     onDeleting()
                     toast.success('Strategy successfully deleted!')
+                    dispatch(updateAllStrategies())
                 }, err => {
                     if (err.response.status === 401) {
                         toast.warn("Authorization period expired")
@@ -65,6 +74,7 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
                 if (path === "add") {
                     onDeleting()
                     toast.success('Strategy successfully added!')
+                    dispatch(updateMyStrategies())
                 } else {
                     toast.success('Strategy successfully edited!')
                     setEdit(false)

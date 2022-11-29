@@ -10,8 +10,8 @@ const usrStrCrContr = new userStrategiesCrypto
 module.exports = class userStrategies {
 
     async add(userId, strategyId, amount, leverage, crypto) {
-        const candidate = await UserStrategies.findOne({ $and: [{strategyId: strategyId}, {userId: userId}] })
-        if (candidate.disabled === false) {
+        const candidate = await UserStrategies.findOne({ strategyId: strategyId, userId: userId })
+        if (candidate && candidate.disabled === false) {
             return { error: 1, msg: "Strategy already added" }
         }
 
@@ -177,7 +177,7 @@ module.exports = class userStrategies {
             },
             { $match: {data: { $ne: [] }} },
             { $count: "count" }
-        ]).then(count => count[0].count)
+        ]).then(count => count[0] ? count[0].count : 0)
     }
 
 };

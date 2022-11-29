@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { check, validationResult } = require('express-validator')
 const auth = require('../middleware/auth.middleware');
 const validation = require('../middleware/validation.middleware');
+const userBinanceActionsCheck = require('../middleware/userBinanceActionsCheck.middleware');
 
 const userStrategiesController = require('../controllers/userStrategies.controller')
 const userStrContr = new userStrategiesController
@@ -31,7 +32,7 @@ router.get('/get', auth,
     })
 
 // api/userStrategies/add
-router.post('/add', auth, [
+router.post('/add', auth, userBinanceActionsCheck, [
         check('strategyId', 'Incorrect strategyId').notEmpty(),
         check('amount', 'Incorrect amount').notEmpty().isNumeric(),
         check('leverage', 'Incorrect leverage').notEmpty().isNumeric({no_symbols: true}),
@@ -51,12 +52,13 @@ router.post('/add', auth, [
 
             res.json({userStrategies})
         } catch (e) {
+            console.log(e)
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
     })
 
-// api/userStrategies/add
-router.post('/edit', auth, [
+// api/userStrategies/edit
+router.post('/edit', auth, userBinanceActionsCheck, [
         check('userStrategyId', 'Incorrect strategyId').notEmpty(),
         check('amount', 'Incorrect amount').notEmpty().isNumeric(),
         check('leverage', 'Incorrect leverage').notEmpty().isNumeric({no_symbols: true}),
@@ -81,7 +83,7 @@ router.post('/edit', auth, [
     })
 
 // api/userStrategies/disable
-router.post('/disable', auth, [
+router.post('/disable', auth, userBinanceActionsCheck, [
         check('userStrategyId', 'Incorrect strategyId').notEmpty()
     ],
     validation,

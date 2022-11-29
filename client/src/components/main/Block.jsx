@@ -11,6 +11,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
     const dispatch = useDispatch()
 
     const { userData } = useSelector(({ user }) => user);
+    const { updateAllStrategies, updateMyStrategies } = useSelector(({ updates }) => updates);
 
     const [data, setData] = useState([])
     const [page, setPage] = useState(0)
@@ -90,6 +91,20 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
             loadData(page, search)
         }
     }, [])
+
+    useEffect(() => {
+        if (title === "Add new strategy") {
+            setLoading(true)
+            loadData(0, search, true)
+        }
+    }, [updateAllStrategies])
+
+    useEffect(() => {
+        if (title === "My strategies") {
+            setLoading(true)
+            loadData(0, search, true)
+        }
+    }, [updateMyStrategies])
 
     const loadData = (page, search, reset = false) => {
         setLoading(true)
