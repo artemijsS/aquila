@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+const Binance = require('node-binance-api');
 
 module.exports = class userController {
 
@@ -23,6 +25,82 @@ module.exports = class userController {
         user.notifications = value
         await user.save()
         return true
+    }
+
+    async updateBinanceApiKey(userId, key) {
+        const user = await User.findOne({ _id: userId })
+        if (!user) {
+            return [400, "User not found"]
+        }
+
+        if (user.BINANCE_API_SECRET) {
+            const secret = jwt.verify(user.BINANCE_API_SECRET, process.env.JWT_SECRET);
+            const binance = new Binance().options({
+                APIKEY: key,
+                APISECRET: secret
+            })
+
+            const login = await binance.futuresBalance()
+            if (login.msg) {
+                user.BINANCE_API_SECRET = ''
+                await user.save()
+                return [400, "Binance Api Key or Secret are invalid"]
+            }
+
+            user.BINANCE_API_KEY = jwt.sign(
+                key,
+                process.env.JWT_SECRET
+            )
+            user.disabled = false
+            await user.save()
+            return [200, "Binance Api Key and Secret are accepted and work fine!"]
+        }
+
+        user.BINANCE_API_KEY = jwt.sign(
+            key,
+            process.env.JWT_SECRET
+        )
+
+        await user.save()
+        return [200, "Binance Api key successfully updated"]
+    }
+
+    async updateBinanceApiSecret(userId, secret) {
+        const user = await User.findOne({ _id: userId })
+        if (!user) {
+            return [400, "User not found"]
+        }
+
+        if (user.BINANCE_API_KEY) {
+            const key = jwt.verify(user.BINANCE_API_KEY, process.env.JWT_SECRET);
+            const binance = new Binance().options({
+                APIKEY: key,
+                APISECRET: secret
+            })
+
+            const login = await binance.futuresBalance()
+            if (login.msg) {
+                user.BINANCE_API_KEY = ''
+                await user.save()
+                return [400, "Binance Api Secret or Key are invalid"]
+            }
+
+            user.BINANCE_API_SECRET = jwt.sign(
+                secret,
+                process.env.JWT_SECRET
+            )
+            user.disabled = false
+            await user.save()
+            return [200, "Binance Api Secret and Key are accepted and work fine!"]
+        }
+
+        user.BINANCE_API_SECRET = jwt.sign(
+            secret,
+            process.env.JWT_SECRET
+        )
+
+        await user.save()
+        return [200, "Binance Api secret successfully updated"]
     }
 
 };

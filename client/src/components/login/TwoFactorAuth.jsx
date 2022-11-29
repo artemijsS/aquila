@@ -81,7 +81,10 @@ function TwoFactorAuth ({confirm = false, onConfirm = null}) {
     }
 
     const onBackClick = () => {
-        dispatch(set2FA(false))
+        if (confirm)
+            onConfirm()
+        else
+            dispatch(set2FA(false))
     }
 
     return (

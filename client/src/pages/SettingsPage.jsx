@@ -19,10 +19,15 @@ function SettingsPage () {
     const [binanceApiKeyEdit, setBinanceApiKeyEdit] = useState(false)
     const [binanceApiSecretEdit, setBinanceApiSecretEdit] = useState(false)
 
+    const [binanceApiKey, setBinanceApiKey] = useState('')
+    const [binanceApiSecret, setBinanceApiSecret] = useState('')
+
     const [_2FA, set2FA] = useState(false)
 
     const toggleNotificationsRef = useRef()
     const toggle2FARef = useRef()
+    const inputKeyRef = useRef()
+    const inputSecretRef = useRef()
 
     useEffect(() => {
         axios.get(process.env.REACT_APP_SERVER + `/api/user/get`, {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
@@ -51,6 +56,10 @@ function SettingsPage () {
 
             ref.current.classList.remove(className)
         }
+        ref.current.disabled = toggle
+    }
+
+    const setInputLoading = (ref, toggle) => {
         ref.current.disabled = toggle
     }
 
@@ -86,12 +95,61 @@ function SettingsPage () {
         updateForToggles({notifications}, "updateNotifications", toggleNotificationsRef)
     }
 
+    const onBinanceUpdate = (data, path, ref) => {
+        setInputLoading(ref, true)
+        axios.post(process.env.REACT_APP_SERVER + `/api/user/` + path, data, {headers: {authorization: `Bearer ${userData.token}`}})
+            .then(res => {
+                toast.success(res.data.msg)
+                setInputLoading(ref, false)
+                if (path === "updateBinanceApiKey") {
+                    setUser({...user, BINANCE_API_KEY: true})
+                    setBinanceApiKeyEdit(false)
+                }
+                else {
+                    setUser({...user, BINANCE_API_SECRET: true})
+                    setBinanceApiSecretEdit(false)
+                }
+            }, err => {
+                if (err.response.status === 401) {
+                    toast.warn("Authorization period expired")
+                    dispatch(logoutUser())
+                }
+                if (err.response.status === 402) {
+                    set2FA(true)
+                    setInputLoading(ref, false)
+                    toast.error("2FA is required")
+                    return
+                }
+                if (err.response.data.errors) {
+                    setInputLoading(ref, false)
+                    ref.current.classList.add('red')
+                    return
+                }
+                if (err.response.status === 400) {
+                    setInputLoading(ref, false)
+                    setUser({...user, BINANCE_API_SECRET: false, BINANCE_API_KEY: false})
+                    toast.error(err.response.data.msg)
+                    return
+                }
+                setInputLoading(ref, false)
+                toast.error("Error, try one more time")
+            })
+    }
+
     const onBinanceApiKeyUpdate = () => {
         setBinanceApiKeyEdit(true)
     }
 
     const onBinanceApiSecretUpdate = () => {
         setBinanceApiSecretEdit(true)
+    }
+
+    const changeBinanceApiKeyHandler = (e) => {
+        setBinanceApiKey(e.target.value)
+    }
+
+    const changeBinanceApiSecretHandler = (e) => {
+        setBinanceApiSecret(e.target.value)
     }
 
     const on2FAConfirm = () => {
@@ -145,9 +203,12 @@ function SettingsPage () {
                                 </div>
                                 <div className="info">
                                     <div className="label">Binance API key</div>
-                                    <div className="value">
+                                    <div className="value relative">
                                         {binanceApiKeyEdit ?
-                                            <input type="text"/>
+                                            <>
+                                                <input defaultValue={binanceApiKey} onChange={changeBinanceApiKeyHandler} ref={inputKeyRef} type="text"/>
+                                                <svg onClick={() => onBinanceUpdate({BINANCE_API_KEY: binanceApiKey}, "updateBinanceApiKey", inputKeyRef)} className={"save"} width="25" height="25" viewBox="0 0 440 480" xmlns="http://www.w3.org/2000/svg" ><title>save</title><path d="M220 430q81-2 135-55 53-54 55-135-2-81-55-135-54-53-135-55-81 2-135 55-53 54-55 135 2 81 55 135 54 53 135 55l0 0z m-110-190l30-30 57 57 103-117 30 30-132 150-88-90z" /></svg>
+                                            </>
                                             :
                                             <button onClick={onBinanceApiKeyUpdate} className={user.BINANCE_API_KEY ? "" : "save"}>{user.BINANCE_API_KEY ? "Change" : "Add"}</button>
                                         }
@@ -155,9 +216,12 @@ function SettingsPage () {
                                 </div>
                                 <div className="info">
                                     <div className="label">Binance API secret</div>
-                                    <div className="value">
+                                    <div className="value relative">
                                         {binanceApiSecretEdit ?
-                                            <input type="text"/>
+                                            <>
+                                                <input defaultValue={binanceApiSecret} onChange={changeBinanceApiSecretHandler} ref={inputSecretRef} type="text"/>
+                                                <svg onClick={() => onBinanceUpdate({BINANCE_API_SECRET: binanceApiSecret}, "updateBinanceApiSecret", inputSecretRef)} className={"save"} width="25" height="25" viewBox="0 0 440 480" xmlns="http://www.w3.org/2000/svg" ><title>save</title><path d="M220 430q81-2 135-55 53-54 55-135-2-81-55-135-54-53-135-55-81 2-135 55-53 54-55 135 2 81 55 135 54 53 135 55l0 0z m-110-190l30-30 57 57 103-117 30 30-132 150-88-90z" /></svg>
+                                            </>
                                             :
                                             <button onClick={onBinanceApiSecretUpdate} className={user.BINANCE_API_SECRET ? "" : "save"}>{user.BINANCE_API_SECRET ? "Change" : "Add"}</button>
                                         }

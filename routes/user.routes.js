@@ -49,7 +49,7 @@ router.get('/admin/get', auth, admin,
         }
     })
 
-// api/user/delete
+// api/user/delete TODO
 router.delete('/admin/delete', auth, admin,
     async (req, res) => {
         try {
@@ -184,12 +184,32 @@ router.post('/updateBinanceApiKey', auth, _2FA, [
     async (req, res) => {
         try {
 
-            // const userId = req.user.userId
-            // const { notifications } = req.body
-            // await usrContr.updateNotifications(userId, notifications)
+            const userId = req.user.userId
+            const { BINANCE_API_KEY } = req.body
+            const [status, msg] = await usrContr.updateBinanceApiKey(userId, BINANCE_API_KEY)
 
-            res.json({msg: "Notifications successfully updated"})
+            res.status(status).json({ msg })
         } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
+// api/user/updateBinanceApiSecret
+router.post('/updateBinanceApiSecret', auth, _2FA, [
+        check('BINANCE_API_SECRET', 'Incorrect BINANCE_API_SECRET').notEmpty().isString(),
+    ],
+    validation,
+    async (req, res) => {
+        try {
+
+            const userId = req.user.userId
+            const { BINANCE_API_SECRET } = req.body
+            const [status, msg] = await usrContr.updateBinanceApiSecret(userId, BINANCE_API_SECRET)
+
+            res.status(status).json({ msg })
+        } catch (e) {
+            console.log(e)
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
     })

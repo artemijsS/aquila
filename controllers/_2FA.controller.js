@@ -98,19 +98,4 @@ module.exports = class strategyCrypto {
         return true
     }
 
-    async check2FA(userId) {
-        const user = await User.findOne({ _id: userId })
-        return user.twoFAuthentication
-    }
-
-    async check2FACode(userId) {
-        const user = await User.findOne({ _id: userId })
-        if (!user.twoFAuthenticationCodeTokenForConfirm)
-            return {error: 1, msg: "Please try one more time"}
-
-
-
-        return user.twoFAuthentication
-    }
-
 };

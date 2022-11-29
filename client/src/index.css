@@ -803,3 +803,20 @@ textarea:focus {
   height: 3px;
   width: 200px;
 }
+
+
+.relative {
+  position: relative !important;
+}
+
+svg.save {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  fill: #1486f0;
+}
+svg.save:hover {
+  cursor: pointer;
+  fill: #0055ff;
+}
