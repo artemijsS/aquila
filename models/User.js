@@ -12,6 +12,7 @@ const schema = new Schema({
     twoFAuthenticationCodeToken: {type: String},
     twoFAuthenticationConfirm: {type: String},
     disabled: {type: Boolean, default: false},
+    disabledActionsBinance: {type: Boolean, default: true},
     notifications: {type: Boolean, default: false}
 })
 

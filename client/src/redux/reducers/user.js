@@ -24,6 +24,14 @@ const user = (state = initialState, action) => {
                     token: action.payload.token
                 }
             }
+        case "USER_DISABLED_ACTIONS_BINANCE":
+            return {
+                ...state,
+                userData: {
+                    ...state.userData,
+                    disabledActionsBinance: action.payload
+                }
+            }
         default:
             return state
     }

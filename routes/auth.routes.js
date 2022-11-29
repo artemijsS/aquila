@@ -124,7 +124,7 @@ router.post('/login',
             const username = user.telegram_username;
             const role = user.role;
 
-            res.json({ token, username, role, telegram_chatId: user.telegram_chatId })
+            res.json({ token, username, role, telegram_chatId: user.telegram_chatId, disabledActionsBinance: user.disabledActionsBinance })
 
         } catch (e) {
             res.status(500).json({ message: "Error" })
@@ -152,7 +152,7 @@ router.get('/check', async (req, res) => {
         user.last_time_seen = new Date().toJSON();
         await user.save()
 
-        res.json({ username: user.telegram_username, role: user.role, telegram_chatId: user.telegram_chatId })
+        res.json({ username: user.telegram_username, role: user.role, telegram_chatId: user.telegram_chatId, disabledActionsBinance: user.disabledActionsBinance })
     } catch (e) {
         res.status(500).json({ message: "Error" })
     }

@@ -5,7 +5,7 @@ import ContentLoader from "react-content-loader";
 import {useDispatch, useSelector} from "react-redux";
 import axios from "axios";
 import {toast} from "react-toastify";
-import {logoutUser} from "../redux/actions/user";
+import {logoutUser, setDisabledActionsBinance} from "../redux/actions/user";
 
 function SettingsPage () {
 
@@ -102,10 +102,14 @@ function SettingsPage () {
                 toast.success(res.data.msg)
                 setInputLoading(ref, false)
                 if (path === "updateBinanceApiKey") {
+                    if (user.BINANCE_API_SECRET)
+                        dispatch(setDisabledActionsBinance(false))
                     setUser({...user, BINANCE_API_KEY: true})
                     setBinanceApiKeyEdit(false)
                 }
                 else {
+                    if (user.BINANCE_API_KEY)
+                        dispatch(setDisabledActionsBinance(false))
                     setUser({...user, BINANCE_API_SECRET: true})
                     setBinanceApiSecretEdit(false)
                 }
@@ -127,6 +131,7 @@ function SettingsPage () {
                 }
                 if (err.response.status === 400) {
                     setInputLoading(ref, false)
+                    dispatch(setDisabledActionsBinance(true))
                     setUser({...user, BINANCE_API_SECRET: false, BINANCE_API_KEY: false})
                     toast.error(err.response.data.msg)
                     return

@@ -27,8 +27,9 @@ export const userDataFetch = (obj, path) => {
                         token: data.token,
                         telegram_username: data.username,
                         telegram_chatId: data.telegram_chatId,
-                        role: data.role
-                    }
+                        role: data.role,
+                        disabledActionsBinance: data.disabledActionsBinance
+                }
                     dispatch(loginUser(user))
                     dispatch(setUserLoading(false))
                 }
@@ -60,7 +61,8 @@ export const getProfileFetch = () => {
                             token: token,
                             telegram_username: data.username,
                             telegram_chatId: data.telegram_chatId,
-                            role: data.role
+                            role: data.role,
+                            disabledActionsBinance: data.disabledActionsBinance
                         }
                         dispatch(loginUser(user))
                         dispatch(setUserLoading(false))
@@ -133,4 +135,9 @@ const loginUser = obj => ({
 export const set2FA = obj => ({
     type: 'USER_2FA',
     payload: obj
+})
+
+export const setDisabledActionsBinance = bool => ({
+    type: 'USER_DISABLED_ACTIONS_BINANCE',
+    payload: bool
 })

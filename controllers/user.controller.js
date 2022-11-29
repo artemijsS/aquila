@@ -43,6 +43,7 @@ module.exports = class userController {
             const login = await binance.futuresBalance()
             if (login.msg) {
                 user.BINANCE_API_SECRET = ''
+                user.disabledActionsBinance = true
                 await user.save()
                 return [400, "Binance Api Key or Secret are invalid"]
             }
@@ -51,7 +52,7 @@ module.exports = class userController {
                 key,
                 process.env.JWT_SECRET
             )
-            user.disabled = false
+            user.disabledActionsBinance = false
             await user.save()
             return [200, "Binance Api Key and Secret are accepted and work fine!"]
         }
@@ -81,6 +82,7 @@ module.exports = class userController {
             const login = await binance.futuresBalance()
             if (login.msg) {
                 user.BINANCE_API_KEY = ''
+                user.disabledActionsBinance = true
                 await user.save()
                 return [400, "Binance Api Secret or Key are invalid"]
             }
@@ -89,7 +91,7 @@ module.exports = class userController {
                 secret,
                 process.env.JWT_SECRET
             )
-            user.disabled = false
+            user.disabledActionsBinance = false
             await user.save()
             return [200, "Binance Api Secret and Key are accepted and work fine!"]
         }
