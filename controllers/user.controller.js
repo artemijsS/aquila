@@ -13,6 +13,11 @@ module.exports = class userController {
         return user
     }
 
+    async getChatId(userId) {
+        const user = await User.findOne({_id: userId}, 'telegram_chatId')
+        return user.telegram_chatId
+    }
+
     async updateTwoFAuthentication(userId, value) {
         const user = await User.findOne({ _id: userId })
         user.twoFAuthentication = value

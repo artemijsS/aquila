@@ -9,6 +9,9 @@ const validation = require('../middleware/validation.middleware')
 const _2FAController = require('../controllers/_2FA.controller')
 const _2FAContr = new _2FAController
 
+const Telegram = require('../utils/telegram.util')
+const telegram = new Telegram()
+
 const User = require('../models/User');
 const UserInvite = require('../models/User_invite');
 
@@ -124,6 +127,8 @@ router.post('/login',
             const username = user.telegram_username;
             const role = user.role;
 
+            await telegram.sendLoginInfo(user.telegram_chatId, req)
+
             res.json({ token, username, role, telegram_chatId: user.telegram_chatId, disabledActionsBinance: user.disabledActionsBinance })
 
         } catch (e) {
@@ -237,6 +242,8 @@ router.post('/2FA',
             const username = user.telegram_username;
             const role = user.role;
 
+            await telegram.sendLoginInfo(user.telegram_chatId, req)
+
             res.json({ token, username, role, telegram_chatId: user.telegram_chatId })
 
         } catch (e) {
@@ -287,7 +294,7 @@ router.post('/2FAGenerate',
             )
             await user.save()
 
-            await bot.sendMessage(user.telegram_chatId, "code - " + code)
+            await telegram.send2FACode(user.telegram_chatId, code)
 
         } catch (e) {
             res.status(500).json({ message: "Error" })

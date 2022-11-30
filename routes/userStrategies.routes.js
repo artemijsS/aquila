@@ -1,8 +1,9 @@
 const { Router } = require('express');
-const { check, validationResult } = require('express-validator')
+const { check } = require('express-validator')
 const auth = require('../middleware/auth.middleware');
 const validation = require('../middleware/validation.middleware');
 const userBinanceActionsCheck = require('../middleware/userBinanceActionsCheck.middleware');
+const telegramNotification = require('../middleware/telegramNotification.middleware');
 
 const userStrategiesController = require('../controllers/userStrategies.controller')
 const userStrContr = new userStrategiesController
@@ -39,7 +40,7 @@ router.post('/add', auth, userBinanceActionsCheck, [
         check('crypto', 'Incorrect crypto').notEmpty().isArray({min: 1})
     ],
     validation,
-    async (req, res) => {
+    async (req, res, next) => {
         try {
 
             const userId = req.user.userId
@@ -50,12 +51,16 @@ router.post('/add', auth, userBinanceActionsCheck, [
                 return res.status(400).json(userStrategies)
             }
 
+            const name = await userStrContr.getName(userStrategies._id)
             res.json({userStrategies})
+            req.notificationMessage = name + " strategy added!"
+            next()
+
         } catch (e) {
             console.log(e)
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
-    })
+    }, telegramNotification)
 
 // api/userStrategies/edit
 router.post('/edit', auth, userBinanceActionsCheck, [
@@ -65,7 +70,7 @@ router.post('/edit', auth, userBinanceActionsCheck, [
         check('crypto', 'Incorrect crypto').notEmpty().isArray({min: 1})
     ],
     validation,
-    async (req, res) => {
+    async (req, res, next) => {
         try {
 
             const userId = req.user.userId
@@ -76,18 +81,24 @@ router.post('/edit', auth, userBinanceActionsCheck, [
                 return res.status(400).json(userStrategies)
             }
 
+            const name = await userStrContr.getName(userStrategies._id)
             res.json({userStrategies})
+            req.notificationMessage = "<b>"+name+"</b>" + " strategy edited!\namount = "
+                + amount
+                + "\nleverage = " + leverage
+                + "\ncryptos =" + crypto.map(obj => " " + obj.label).toString()
+            next()
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
-    })
+    }, telegramNotification)
 
 // api/userStrategies/disable
 router.post('/disable', auth, userBinanceActionsCheck, [
         check('userStrategyId', 'Incorrect strategyId').notEmpty()
     ],
     validation,
-    async (req, res) => {
+    async (req, res, next) => {
         try {
 
             const userId = req.user.userId
@@ -98,10 +109,14 @@ router.post('/disable', auth, userBinanceActionsCheck, [
                 return res.status(400).json(userStrategies)
             }
 
+            const name = await userStrContr.getName(userStrategies._id)
+
             res.json({userStrategies})
+            req.notificationMessage = name + " strategy deleted!"
+            next()
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
-    })
+    }, telegramNotification)
 
 module.exports = router;

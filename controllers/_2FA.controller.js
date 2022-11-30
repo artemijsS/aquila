@@ -1,7 +1,9 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { bot } = require('../telegram/telegram')
+const Telegram = require('../utils/telegram.util')
+const telegram = new Telegram()
+
 
 module.exports = class strategyCrypto {
 
@@ -49,7 +51,7 @@ module.exports = class strategyCrypto {
         )
         await user.save()
 
-        await bot.sendMessage(user.telegram_chatId, "code - " + code)
+        await telegram.send2FACode(user.telegram_chatId, code)
 
         return true
     }

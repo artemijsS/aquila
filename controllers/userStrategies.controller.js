@@ -180,4 +180,9 @@ module.exports = class userStrategies {
         ]).then(count => count[0] ? count[0].count : 0)
     }
 
+    async getName(id) {
+        const strategy = await UserStrategies.findOne({ _id: id }).populate('strategyId', 'name').select({_id: 0, name: '$strategyId.name'}).lean()
+        return strategy.strategyId.name
+    }
+
 };
