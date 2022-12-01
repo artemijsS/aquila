@@ -5,7 +5,7 @@ import { useRoutes } from "./routes";
 import { getProfileFetch } from "./redux/actions/user";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-
+import socket from "./socket";
 
 function App({ urlPath }) {
   const routes = useRoutes(urlPath)

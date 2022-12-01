@@ -2,12 +2,14 @@ const { Router } = require('express');
 const { check, validationResult } = require('express-validator')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { bot } = require('../telegram/telegram')
 const auth = require('../middleware/auth.middleware')
 const validation = require('../middleware/validation.middleware')
 
 const _2FAController = require('../controllers/_2FA.controller')
 const _2FAContr = new _2FAController
+
+const usrController = require('../controllers/user.controller')
+const usrContr = new usrController
 
 const Telegram = require('../utils/telegram.util')
 const telegram = new Telegram()
@@ -65,7 +67,7 @@ router.post('/register',
             const token = jwt.sign(
                 { userId: user.id, role: user.role },
                 process.env.JWT_SECRET,
-                { expiresIn: '2h' }
+                { expiresIn: '1min' }
             );
 
             res.json({ token })
@@ -127,11 +129,14 @@ router.post('/login',
             const username = user.telegram_username;
             const role = user.role;
 
+            await usrContr.addJWT(user._id, token)
+            req.tokenPart = token.split('.')[2]
             await telegram.sendLoginInfo(user.telegram_chatId, req)
 
-            res.json({ token, username, role, telegram_chatId: user.telegram_chatId, disabledActionsBinance: user.disabledActionsBinance })
+            res.json({ id: user._id, token, username, role, telegram_chatId: user.telegram_chatId, disabledActionsBinance: user.disabledActionsBinance })
 
         } catch (e) {
+            console.log(e)
             res.status(500).json({ message: "Error" })
         }
     })
@@ -157,7 +162,7 @@ router.get('/check', async (req, res) => {
         user.last_time_seen = new Date().toJSON();
         await user.save()
 
-        res.json({ username: user.telegram_username, role: user.role, telegram_chatId: user.telegram_chatId, disabledActionsBinance: user.disabledActionsBinance })
+        res.json({ id: user._id, username: user.telegram_username, role: user.role, telegram_chatId: user.telegram_chatId, disabledActionsBinance: user.disabledActionsBinance })
     } catch (e) {
         res.status(500).json({ message: "Error" })
     }
@@ -242,9 +247,11 @@ router.post('/2FA',
             const username = user.telegram_username;
             const role = user.role;
 
+            await usrContr.addJWT(user._id, token)
+
             await telegram.sendLoginInfo(user.telegram_chatId, req)
 
-            res.json({ token, username, role, telegram_chatId: user.telegram_chatId })
+            res.json({ id: user._id, token, username, role, telegram_chatId: user.telegram_chatId })
 
         } catch (e) {
             res.status(500).json({ message: "Error" })

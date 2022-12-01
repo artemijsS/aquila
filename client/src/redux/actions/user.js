@@ -1,4 +1,5 @@
 import {set2FALoading, setUserLoading} from "./loading";
+import socket from "../../socket";
 
 export const userDataFetch = (obj, path) => {
     return dispatch => {
@@ -24,14 +25,16 @@ export const userDataFetch = (obj, path) => {
                     }
                     localStorage.setItem("token", data.token)
                     const user = {
+                        id: data.id,
                         token: data.token,
                         telegram_username: data.username,
                         telegram_chatId: data.telegram_chatId,
                         role: data.role,
                         disabledActionsBinance: data.disabledActionsBinance
-                }
+                    }
                     dispatch(loginUser(user))
                     dispatch(setUserLoading(false))
+                    socket.emit("userSessionStart", { id: user.id, token: user.token })
                 }
             })
     }
@@ -58,6 +61,7 @@ export const getProfileFetch = () => {
                         dispatch(setUserLoading(false))
                     } else {
                         const user = {
+                            id: data.id,
                             token: token,
                             telegram_username: data.username,
                             telegram_chatId: data.telegram_chatId,
@@ -66,6 +70,7 @@ export const getProfileFetch = () => {
                         }
                         dispatch(loginUser(user))
                         dispatch(setUserLoading(false))
+                        socket.emit("userSessionStart", { id: user.id, token: user.token })
                     }
                 })
         } else {
@@ -114,7 +119,10 @@ export const TwoFA = (telegram_username, code) => {
     }
 }
 
-export const logoutUser = () => {
+export const logoutUser = (byTelegram = false) => {
+    if (!byTelegram) {
+        socket.emit("logout")
+    }
     return dispatch => {
         dispatch(logout())
     }

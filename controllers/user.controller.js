@@ -18,6 +18,58 @@ module.exports = class userController {
         return user.telegram_chatId
     }
 
+    async getUserByChatId(chatId) {
+        return User.findOne({ telegram_chatId: chatId })
+    }
+
+    async checkTokenAndDisabled(userId, token) {
+        const user = await User.findOne({_id: userId})
+        if (user.disabled)
+            return false
+        if (!user.JWTs.includes(token))
+            return false
+
+        return true
+    }
+
+    async addJWT(userId, token) {
+        const user = await User.findOne({_id: userId})
+
+        if (!user.JWTs.includes(token)) {
+            user.JWTs.push(token)
+        }
+
+        let tokens = []
+        for (const tok of user.JWTs) {
+            try {
+                jwt.verify(tok, process.env.JWT_SECRET )
+                tokens.push(tok)
+            } catch {}
+        }
+
+        user.JWTs = tokens
+        await user.save()
+    }
+
+    async deleteJWT(userId, tokenPart, all = false) {
+        const user = await User.findOne({_id: userId})
+
+        let tokens = []
+        if (!all) {
+            for (const tok of user.JWTs) {
+                try {
+                    jwt.verify(tok, process.env.JWT_SECRET)
+                    if (!tok.includes(tokenPart))
+                        tokens.push(tok)
+                } catch {
+                }
+            }
+        }
+
+        user.JWTs = tokens
+        await user.save()
+    }
+
     async updateTwoFAuthentication(userId, value) {
         const user = await User.findOne({ _id: userId })
         user.twoFAuthentication = value

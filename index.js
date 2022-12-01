@@ -2,9 +2,23 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
-require('./telegram/telegram');
+const { createServer } = require("http");
 
 const app = express();
+
+const httpServer = createServer(app);
+
+//**************************
+//  SOCKETS
+//**************************
+
+const io = require('./socket.js').init(httpServer);
+
+io.on("connection", (socket) => {
+    require('./sockets/online.socket')(socket, io)
+});
+
+//**************************
 
 app.use(cors());
 app.use(express.json({ extended: true }));
@@ -54,8 +68,7 @@ async function startApp() {
             useUnifiedTopology: true
         });
 
-        const server = app.listen(PORT, () => console.log(`App has been started on port ${PORT}...`))
-
+        httpServer.listen(PORT, () => console.log(`App has been started on port ${PORT}...`))
     } catch (e) {
         console.log(e)
     }

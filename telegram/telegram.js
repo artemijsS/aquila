@@ -1,6 +1,11 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 const { checkRegistration, errorMsg } = require('./actions')
+let userSessions = require('../user_sessions')
+const io = require('../socket').get();
+
+const usrController = require('../controllers/user.controller')
+const usrContr = new usrController
 
 const token = process.env.API_TELEGRAM;
 
@@ -67,6 +72,73 @@ bot.onText(/\/login/, (msg) => {
             })
         })
     });
+});
+
+bot.on('callback_query', async function onCallbackQuery(callbackQuery) {
+    const action_data = callbackQuery.data;
+    const msg = callbackQuery.message;
+    const opts = {
+        chat_id: msg.chat.id,
+        message_id: msg.message_id,
+        parse_mode: "HTML"
+    };
+    let text;
+    text = 'Edited Text';
+
+    const action = action_data.split(':')[0]
+    const data = action_data.split(':')[1]
+
+    if (action === 'EXIT') {
+        const user = await usrContr.getUserByChatId(msg.chat.id)
+        if (!user) {
+            text = "No user for this chat"
+            try {
+                await bot.editMessageText(text, opts);
+            } catch {
+                console.log("editMessageText bug")
+            }
+            return
+        }
+        if (userSessions[user._id]) {
+            Object.keys(userSessions[user._id]).map(socket => {
+                if (userSessions[user._id][socket].includes(data)) {
+                    io.to(socket).emit('logout')
+                    delete userSessions[user._id][socket]
+                }
+            })
+        }
+
+        await usrContr.deleteJWT(user._id, data)
+        text = msg.text + "\n⛔️⛔️  <b>Session closed</b>  ⛔️⛔️"
+    }
+
+    if (action === 'EXIT_ALL') {
+        const user = await usrContr.getUserByChatId(msg.chat.id)
+        if (!user) {
+            text = "No user for this chat"
+            try {
+                await bot.editMessageText(text, opts);
+            } catch {
+                console.log("editMessageText bug")
+            }
+            return
+        }
+        if (userSessions[user._id]) {
+            Object.keys(userSessions[user._id]).map(socket => {
+                io.to(socket).emit('logout')
+                delete userSessions[user._id][socket]
+            })
+        }
+
+        await usrContr.deleteJWT(user._id, data, true)
+        text = msg.text + "\n⛔️⛔️  <b>Sessions closed on all devises</b>  ⛔️⛔️"
+    }
+
+    try {
+        await bot.editMessageText(text, opts);
+    } catch {
+        console.log("editMessageText bug")
+    }
 });
 
 module.exports = { bot };

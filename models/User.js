@@ -13,7 +13,8 @@ const schema = new Schema({
     twoFAuthenticationConfirm: {type: String},
     disabled: {type: Boolean, default: false},
     disabledActionsBinance: {type: Boolean, default: true},
-    notifications: {type: Boolean, default: false}
+    notifications: {type: Boolean, default: false},
+    JWTs: {type: [String], required: false, default: []}
 })
 
 module.exports = model('User', schema)
