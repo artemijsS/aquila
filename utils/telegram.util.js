@@ -1,5 +1,6 @@
 const { bot } = require('../telegram/telegram')
 const browser = require('browser-detect');
+const requestIP = require('request-ip');
 
 module.exports = class Bot {
 
@@ -30,7 +31,7 @@ module.exports = class Bot {
     async sendLoginInfo(chatId, req) {
         const title = "🚪 <b>Someone logged in aquila</b> 🚪\n\n"
         const browserInfo = browser(req.headers['user-agent']);
-        const ip = req.socket.remoteAddress
+        const ip = requestIP.getClientIp(req);
         const msg = "<i>IP - " + ip + "\nBrowser - " + browserInfo.name + "\nOS - " + browserInfo.os + "\nMobile - " + browserInfo.mobile + "</i>"
         const message = title + msg
         await this.sendMessage(chatId, message)
