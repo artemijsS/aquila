@@ -1,6 +1,8 @@
 const { bot } = require('../telegram/telegram')
 const browser = require('browser-detect');
 const requestIP = require('request-ip');
+const axios = require('axios');
+const GEO_URL = 'https://ipgeolocation.abstractapi.com/v1/?api_key=' + process.env.API_GEO;
 
 module.exports = class Bot {
 
@@ -32,7 +34,9 @@ module.exports = class Bot {
         const title = "🚪 <b>Someone logged in aquila</b> 🚪\n\n"
         const browserInfo = browser(req.headers['user-agent']);
         const ip = requestIP.getClientIp(req);
-        const msg = "<i>IP - " + ip + "\nBrowser - " + browserInfo.name + "\nOS - " + browserInfo.os + "\nMobile - " + browserInfo.mobile + "</i>"
+        const geo = await axios.get(GEO_URL + "&ip_address=" + ip)
+            .then(res => {return res.data.country ? res.data : { country: "?", city: "?" }}, _err => { return { country: "?", city: "?" } } )
+        const msg = "<i>IP - " + ip + "\nCountry - " + geo.country + "\nCity - " + geo.city + "\nBrowser - " + browserInfo.name + "\nOS - " + browserInfo.os + "\nMobile - " + browserInfo.mobile + "</i>"
         const message = title + msg
         await this.sendMessage(chatId, message)
     }
