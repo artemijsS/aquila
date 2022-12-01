@@ -248,7 +248,7 @@ router.post('/2FA',
             const role = user.role;
 
             await usrContr.addJWT(user._id, token)
-
+            req.tokenPart = token.split('.')[2]
             await telegram.sendLoginInfo(user.telegram_chatId, req)
 
             res.json({ id: user._id, token, username, role, telegram_chatId: user.telegram_chatId })

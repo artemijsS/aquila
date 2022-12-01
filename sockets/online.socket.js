@@ -13,14 +13,12 @@ module.exports = (socket, io) => {
         socket.userId = user.id
         socket.token = user.token
         console.log("User session - " + user.id)
-        console.log(userSessions)
     })
 
     socket.on('disconnect', () => {
         if (userSessions[socket.userId])
             delete userSessions[socket.userId][socket.id]
         console.log("Disconnected - " + socket.userId)
-        console.log(userSessions)
     })
 
     socket.on('logout', async () => {

@@ -107,6 +107,7 @@ export const TwoFA = (telegram_username, code) => {
                 } else {
                     localStorage.setItem("token", data.token)
                     const user = {
+                        id: data.id,
                         token: data.token,
                         telegram_username: data.username,
                         telegram_chatId: data.telegram_chatId,
@@ -114,6 +115,7 @@ export const TwoFA = (telegram_username, code) => {
                     }
                     dispatch(loginUser(user))
                     dispatch(set2FALoading(false))
+                    socket.emit("userSessionStart", { id: user.id, token: user.token })
                 }
             })
     }
