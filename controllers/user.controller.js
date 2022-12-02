@@ -55,7 +55,7 @@ module.exports = class userController {
         const user = await User.findOne({_id: userId})
 
         let tokens = []
-        if (!all) {
+        if (!all && user.JWTs) {
             for (const tok of user.JWTs) {
                 try {
                     jwt.verify(tok, process.env.JWT_SECRET)

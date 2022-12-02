@@ -34,6 +34,7 @@ router.post('/new', auth, admin, [
 
             res.json({strategy})
         } catch (e) {
+            console.log(e)
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
 })
@@ -62,24 +63,26 @@ router.get('/get', auth,
 router.delete('/delete', auth, admin,
     async (req, res) => {
         try {
-            let urlId
+            let name
 
-            if (req.query.urlId) {
-                urlId = req.query.urlId
+            if (req.query.name) {
+                name = req.query.name
             } else {
-                return res.status(400).json({error: 1, msg: "no urlId"})
+                return res.status(400).json({error: 1, msg: "no name"})
             }
 
-            await strContr.deleteStrategy(urlId)
+            await strContr.deleteStrategy(name)
 
-            res.json({urlId: urlId, msg: "deleted"})
+            res.json({name: name, msg: "deleted"})
         } catch (e) {
+            console.log(e)
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
     })
 
 // api/strategies/edit
 router.post('/edit', auth, admin, [
+        check('name', 'Incorrect name').notEmpty(),
         check('urlId', 'Incorrect urlId').notEmpty(),
         check('description', 'Incorrect description').notEmpty(),
         check('percentage', 'Incorrect percentage').notEmpty(),
@@ -90,9 +93,9 @@ router.post('/edit', auth, admin, [
     async (req, res) => {
         try {
 
-            const { urlId, description, percentage, source, crypto } = req.body;
+            const { name, urlId, description, percentage, source, crypto } = req.body;
 
-            const strategy = await strContr.edit(urlId, description, percentage, source, crypto)
+            const strategy = await strContr.edit(name, urlId, description, percentage, source, crypto)
 
             if (strategy.error) {
                 return res.status(400).json(strategy)

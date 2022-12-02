@@ -76,12 +76,12 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
         })
     }
 
-    const onDelete = (id) => {
+    const onDelete = (name) => {
         loading(true)
-        if (window.confirm('Are you sure you want to delete ' + id + '?')) {
-            axios.delete(process.env.REACT_APP_SERVER + `/api/strategies/delete?urlId=${id}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(_res => {
-                toast.success("Strategy " + id + " deleted")
-                onDeleting(id)
+        if (window.confirm('Are you sure you want to delete ' + name + '?')) {
+            axios.delete(process.env.REACT_APP_SERVER + `/api/strategies/delete?name=${name}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(_res => {
+                toast.success("Strategy " + name + " deleted")
+                onDeleting(name)
                 cardRef.current.classList.add('delete')
             }, err => {
                 if (err.response.status === 401) {
@@ -133,7 +133,7 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
                 <div className="data">
                     <div className="key">UrlId</div>
                     <div className="value">
-                        {editable ?
+                        {edit ?
                             <input ref={inputRefs.urlId} defaultValue={dataForm.urlId} onChange={changeHandler} name="urlId" type="text"/>
                             :
                             dataForm.urlId
@@ -195,7 +195,7 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
                 :
                 <div className="down">
                     <svg onClick={() => onEdit()} className="edit" width="30" height="30" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" ><title>edit</title><path d="M200 360l150-150-80-80-150 150 80 80z m-140 60l110-30-80-80-30 110z m240-320l80 80 50-50-80-80-50 50z" /></svg>
-                    <svg onClick={() => onDelete(dataForm.urlId)} className="delete" width="30" height="30" viewBox="0 0 400 480" xmlns="http://www.w3.org/2000/svg" ><title>delete</title><path d="M100 400l200 0q8 0 14-6 6-6 6-14l0-200 40 0 0-40-80 0 0-40q0-8-6-14-6-6-14-6l-120 0q-8 0-14 6-6 6-6 14l0 40-80 0 0 40 40 0 0 200q0 8 6 14 6 6 14 6l0 0z m20-40l0-160 60 0 0 160-60 0z m40-200l0-40 80 0 0 40-80 0z m60 200l0-160 60 0 0 160-60 0z" /></svg>
+                    <svg onClick={() => onDelete(dataForm.name)} className="delete" width="30" height="30" viewBox="0 0 400 480" xmlns="http://www.w3.org/2000/svg" ><title>delete</title><path d="M100 400l200 0q8 0 14-6 6-6 6-14l0-200 40 0 0-40-80 0 0-40q0-8-6-14-6-6-14-6l-120 0q-8 0-14 6-6 6-6 14l0 40-80 0 0 40 40 0 0 200q0 8 6 14 6 6 14 6l0 0z m20-40l0-160 60 0 0 160-60 0z m40-200l0-40 80 0 0 40-80 0z m60 200l0-160 60 0 0 160-60 0z" /></svg>
                 </div>
             }
         </div>

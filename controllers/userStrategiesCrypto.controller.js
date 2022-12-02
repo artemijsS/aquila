@@ -1,3 +1,4 @@
+const UserStrategies = require('../models/User_strategies');
 const UserStrategiesCrypto = require('../models/User_strategies_crypto');
 const StrategyCrypto = require('../models/Strategy_crypto');
 
@@ -62,6 +63,17 @@ module.exports = class userStrategiesCrypto {
             }
         }
         return true
+    }
+
+    async disableCrypto(strategyId, cryptoId) {
+        const userStrategies = await UserStrategies.find({ strategyId })
+        userStrategies.map(async userStrategy => {
+            const userStrategiesCrypto = await UserStrategiesCrypto.findOne({ UserStrategiesId: userStrategy._id, cryptoId: cryptoId })
+            if (userStrategiesCrypto) {
+                userStrategiesCrypto.disabled = true
+                await userStrategiesCrypto.save()
+            }
+        })
     }
 
 };

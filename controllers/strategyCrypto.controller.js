@@ -1,5 +1,8 @@
 const StrategyCrypto = require('../models/Strategy_crypto');
 
+const userStrategiesCryptoController = require('./userStrategiesCrypto.controller')
+const usrStrContr = new userStrategiesCryptoController
+
 Array.prototype.diff = function(a)
 {
     return this.filter(function(i) {return a.indexOf(i) < 0;});
@@ -40,6 +43,7 @@ module.exports = class strategyCrypto {
                 if (candidate) {
                     candidate.disabled = true
                     await candidate.save()
+                    await usrStrContr.disableCrypto(strategyId, cr)
                 }
             } catch (e) {
                 return false

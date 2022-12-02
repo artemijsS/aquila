@@ -1,7 +1,10 @@
 const Strategy = require('../models/Strategy');
+const User = require('../models/User');
 const StrategyCrypto = require('../models/Strategy_crypto');
 const UserStrategies = require('../models/User_strategies');
 const UserStrategiesCrypto = require('../models/User_strategies_crypto');
+const Telegram = require('../utils/telegram.util')
+const telegram = new Telegram()
 
 const strategiesCryptoController = require('../controllers/strategyCrypto.controller')
 const strCrContr = new strategiesCryptoController
@@ -11,13 +14,13 @@ module.exports = class strategies {
     async addNew(urlId, name, description, percentage, source, cryptoArr) {
 
         // urlId check
-        let candidate = await Strategy.findOne({ urlId })
-        if (candidate) {
-            return {error: 1, value: "urlId"}
-        }
+        // let candidate = await Strategy.findOne({ urlId })
+        // if (candidate) {
+        //     return {error: 1, value: "urlId"}
+        // }
 
         // name check
-        candidate = await Strategy.findOne({ name })
+        const candidate = await Strategy.findOne({ name })
         if (candidate) {
             return {error: 1, value: "name"}
         }
@@ -39,14 +42,15 @@ module.exports = class strategies {
         return strategy
     }
 
-    async edit(urlId, description, percentage, source, cryptoArr) {
+    async edit(name, urlId, description, percentage, source, cryptoArr) {
 
         // urlId check
-        let strategy = await Strategy.findOne({ urlId })
+        let strategy = await Strategy.findOne({ name })
         if (!strategy) {
-            return {error: 1, value: "No strategy with this urlId"}
+            return {error: 1, value: "No strategy with this name"}
         }
 
+        strategy.urlId = urlId
         strategy.description = description
         strategy.percentage = percentage
         strategy.source = source
@@ -58,7 +62,7 @@ module.exports = class strategies {
 
         await strategy.save();
 
-        const res = await this.get(1, 0, strategy.urlId)
+        const res = await this.get(1, 0, strategy.name)
 
         return res[0]
     }
@@ -147,14 +151,29 @@ module.exports = class strategies {
             .countDocuments()
     }
 
-    async deleteStrategy(urlId) {
-        const strategy = await Strategy.findOne({urlId})
+    async deleteStrategy(name) {
+        const strategy = await Strategy.findOne({name})
 
-        await UserStrategiesCrypto.deleteMany({UserStrategiesId: strategy._id})
+        const userStrategies = await UserStrategies.find({ strategyId: strategy._id })
+
+        userStrategies.map(async userStrategy => {
+            await UserStrategiesCrypto.deleteMany({UserStrategiesId: userStrategy._id})
+        })
+
         await UserStrategies.deleteOne({strategyId: strategy._id})
 
-        await StrategyCrypto.deleteMany({strategyId: strategy._id})
-        await Strategy.deleteOne({ urlId })
+        const strategyCryptos = await StrategyCrypto.find({ strategyId: strategy._id })
+
+        strategyCryptos.map(async strategyCrypto => {
+            await StrategyCrypto.deleteOne({_id: strategyCrypto._id})
+        })
+
+        await Strategy.deleteOne({ name })
+
+        userStrategies.map(async userStrategy => {
+            const user = await User.findOne({ _id: userStrategy.userId })
+            await telegram.sendNotification(user.telegram_chatId, "Be aware,\n" + name + " strategy deleted by Admin\n!!! Please check stock market !!!")
+        })
     }
 
 
