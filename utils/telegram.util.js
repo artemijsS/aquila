@@ -42,7 +42,7 @@ module.exports = class Bot {
         const ip = requestIP.getClientIp(req);
         const geo = await axios.get(GEO_URL + "&ip_address=" + ip)
             .then(res => {return res.data.country ? res.data : { country: "?", city: "?" }}, _err => { return { country: "?", city: "?" } } )
-        const msg = "<i>IP - " + ip + "\nCountry - " + geo.country + "\nCity - " + geo.city + "\nBrowser - " + browserInfo.name + "\nOS - " + browserInfo.os + "\nMobile - " + browserInfo.mobile + "</i>"
+        const msg = "<i>IP - " + ip + "\nCountry - " + geo.country + "\nCity - " + geo.city + "\nBrowser - " + browserInfo.name + "\nOS - " + browserInfo.os + "\nPlatform - " + (browserInfo.mobile ? "mobile" : "PC") + "</i>"
         const message = title + msg
         const callbackDataForOneDevice = "EXIT:" + req.tokenPart
         const buttons = [{ text: 'Exit on this device', callback_data: callbackDataForOneDevice}, { text: 'Exit on all devices', callback_data: "EXIT_ALL:null"}]

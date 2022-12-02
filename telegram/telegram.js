@@ -109,7 +109,7 @@ bot.on('callback_query', async function onCallbackQuery(callbackQuery) {
         }
 
         await usrContr.deleteJWT(user._id, data)
-        text = msg.text + "\n⛔️⛔️  <b>Session closed</b>  ⛔️⛔️"
+        text = msg.text + "\n\n⛔️⛔️  <b>Session closed</b>  ⛔️⛔️"
     }
 
     if (action === 'EXIT_ALL') {
@@ -131,7 +131,7 @@ bot.on('callback_query', async function onCallbackQuery(callbackQuery) {
         }
 
         await usrContr.deleteJWT(user._id, data, true)
-        text = msg.text + "\n⛔️⛔️  <b>Sessions closed on all devises</b>  ⛔️⛔️"
+        text = msg.text + "\n\n⛔️⛔️  <b>Sessions closed on all devises</b>  ⛔️⛔️"
     }
 
     try {
