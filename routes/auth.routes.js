@@ -108,6 +108,9 @@ router.post('/login',
             if (!isMatch)
                 return res.status(400).json({ message: "Incorrect data" })
 
+            if (user.disabled)
+                return res.status(400).json({ message: "Account disabled by Admin" })
+
             if (user.twoFAuthentication) {
                 const token = jwt.sign(
                     { telegram_username },

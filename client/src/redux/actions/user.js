@@ -16,7 +16,7 @@ export const userDataFetch = (obj, path) => {
             .then(data => {
                 if (data.message) {
                     dispatch(setUserLoading(false))
-                    return "error"
+                    return {error: 1, msg: data.message}
                 } else {
                     if (data.twoFA) {
                         dispatch(setUserLoading(false))

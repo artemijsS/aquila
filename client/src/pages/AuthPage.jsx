@@ -28,8 +28,8 @@ function AuthPage () {
     const submit = event => {
         event.preventDefault()
         dispatch(userDataFetch(form,'login')).then(res => {
-            if (res === "error") {
-                toast.error('Incorrect data, try one more time');
+            if (res.error) {
+                toast.error(res.msg);
             } else if (res === "2FA") {
                 set2FA(true)
                 toast.warn('2FA is necessary')

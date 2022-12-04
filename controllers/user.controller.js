@@ -51,25 +51,29 @@ module.exports = class userController {
     }
 
     async deleteJWT(userId, tokenPart, all = false) {
-        const user = await User.findOne({_id: userId})
+        try {
+            const user = await User.findOne({_id: userId})
 
-        if (!user)
-            return false
+            if (!user)
+                return false
 
-        let tokens = []
-        if (!all && user) {
-            for (const tok of user.JWTs) {
-                try {
-                    jwt.verify(tok, process.env.JWT_SECRET)
-                    if (!tok.includes(tokenPart))
-                        tokens.push(tok)
-                } catch {
+            let tokens = []
+            if (!all && user) {
+                for (const tok of user.JWTs) {
+                    try {
+                        jwt.verify(tok, process.env.JWT_SECRET)
+                        if (!tok.includes(tokenPart))
+                            tokens.push(tok)
+                    } catch {
+                    }
                 }
             }
-        }
 
-        user.JWTs = tokens
-        await user.save()
+            user.JWTs = tokens
+            await user.save()
+        } catch (e) {
+            return false
+        }
     }
 
     async updateTwoFAuthentication(userId, value) {
