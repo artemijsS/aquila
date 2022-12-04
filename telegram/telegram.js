@@ -11,6 +11,12 @@ const token = process.env.API_TELEGRAM;
 
 const bot = new TelegramBot(token, { polling: true });
 
+bot.setMyCommands([
+    {
+        command: "start",
+        description: "Register",
+    }
+])
 
 bot.onText(/\/start/, (msg) => {
 
