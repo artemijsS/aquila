@@ -2,9 +2,9 @@ import React, {useEffect, useRef, useState} from 'react'
 import './TwoFactorAuth.css'
 import logo from "../../assets/logo.png";
 import {useDispatch, useSelector} from "react-redux";
-import axios from "axios";
-import {logoutUser, set2FA, TwoFA} from "../../redux/actions/user";
+import { set2FA, TwoFA} from "../../redux/actions/user";
 import { toast } from "react-toastify";
+import { httpPost } from "../../utils/http"
 
 function TwoFactorAuth ({confirm = false, onConfirm = null}) {
 
@@ -23,7 +23,7 @@ function TwoFactorAuth ({confirm = false, onConfirm = null}) {
 
     useEffect(() => {
         if (!confirm)
-            axios.post(process.env.REACT_APP_SERVER + "/api/auth/2FAGenerate", {token: userData.token})
+            httpPost("/api/auth/2FAGenerate", {token: userData.token})
     }, [])
 
     const onSubmit = (e) => {
@@ -39,19 +39,16 @@ function TwoFactorAuth ({confirm = false, onConfirm = null}) {
                 code = code + inputs[index + 1].current.value
             })
             if (confirm) {
-                axios.post(process.env.REACT_APP_SERVER + "/api/auth/2FAConfirm", {code}, {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+                httpPost("/api/auth/2FAConfirm", {code}).then(res => {
                     onConfirm()
                     toast.success(res.data.message)
                 }, err => {
-                    if (err.response.status === 401) {
-                        toast.warn("Authorization period expired")
-                        dispatch(logoutUser())
-                        return
-                    }
                     if (err.response.status === 203) {
+                        toast.error("Time limit exceeded")
                         onConfirm()
                     }
                     toast.error(err.response.data.message)
+                    onConfirm()
                 })
             } else {
                 dispatch(TwoFA(userData.telegram_username, code)).then(res => {

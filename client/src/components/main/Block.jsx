@@ -1,16 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react'
-import {useDispatch, useSelector} from "react-redux";
-import ContentLoader, {List} from "react-content-loader"
+import React, { useEffect, useState } from 'react'
+import { useSelector } from "react-redux";
+import ContentLoader from "react-content-loader"
 import { toast } from "react-toastify";
-import axios from "axios";
-import { logoutUser } from "../../redux/actions/user";
 import { Search } from "../index";
+import { httpGet, httpPost } from "../../utils/http"
 
 function Block ({title, objectForm, urlPath, children, newElement = true, list = false, update = false, updatePath = null, getAllInputPath = null, own = false}) {
 
-    const dispatch = useDispatch()
-
-    const { userData } = useSelector(({ user }) => user);
     const { updateAllStrategies, updateMyStrategies } = useSelector(({ updates }) => updates);
 
     const [data, setData] = useState([])
@@ -50,15 +46,11 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
     const onUpdateData = () => {
         setLoading(true)
-        axios.post(process.env.REACT_APP_SERVER + `/api/${urlPath}/${updatePath}`, {},{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+        httpPost(`/api/${urlPath}/${updatePath}`, {}).then(res => {
             setData([])
             loadData(0, search, true)
             toast.success(res.data)
-        }, err => {
-            if (err.response.status === 401) {
-                toast.warn("Authorization period expired")
-                dispatch(logoutUser())
-            }
+        }, _err => {
             toast.error("Error, try later")
             setLoading(false)
         })
@@ -70,14 +62,10 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
     const getAllInputData = () => {
         setLoading(true)
-        axios.get(process.env.REACT_APP_SERVER + `/api/${getAllInputPath}/getAll`,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+        httpGet(`/api/${getAllInputPath}/getAll`).then(res => {
             setAllInputData(res.data)
             setLoading(false)
-        }, err => {
-            if (err.response.status === 401) {
-                toast.warn("Authorization period expired")
-                dispatch(logoutUser())
-            }
+        }, _err => {
             toast.error("Error with loading all " + title + " data, try later")
             setLoading(false)
         })
@@ -108,7 +96,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
 
     const loadData = (page, search, reset = false) => {
         setLoading(true)
-        axios.get(process.env.REACT_APP_SERVER + `/api/${urlPath}/get?page=${page}&search=${search}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+        httpGet(`/api/${urlPath}/get?page=${page}&search=${search}`).then(res => {
             setPage(Number(res.data.page))
             setPages(Number(res.data.pages))
             if (reset)
@@ -117,11 +105,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
                 setData(data.concat(res.data.data))
             console.log(res.data)
             setLoading(false)
-        }, err => {
-            if (err.response.status === 401) {
-                toast.warn("Authorization period expired")
-                dispatch(logoutUser())
-            }
+        }, _err => {
             setLoading(false)
         })
     }

@@ -1,14 +1,8 @@
 import React, { useState, useRef } from 'react'
-import axios from "axios";
 import {toast} from "react-toastify";
-import {logoutUser} from "../../redux/actions/user";
-import {useDispatch, useSelector} from "react-redux";
+import { httpPost, httpDelete } from "../../utils/http"
 
 function AdminNewUserListCard ({ data, editable = false, addNew = null, onDeleting = null, key = null, close = null }) {
-
-    const dispatch = useDispatch()
-
-    const { userData } = useSelector(({ user }) => user);
 
     const [editError, setEditError] = useState(false)
     const cardRef = useRef()
@@ -22,16 +16,13 @@ function AdminNewUserListCard ({ data, editable = false, addNew = null, onDeleti
     }
 
     const onSave = () => {
-        axios.post(process.env.REACT_APP_SERVER + "/api/userNew/new", dataForm,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+        httpPost("/api/userNew/new", dataForm).then(res => {
             toast.success("New user access saved")
             addNew(res.data.userInvite)
             close()
         }, err => {
             setEditError(true)
-            if (err.response.status === 401) {
-                toast.warn("Authorization period expired")
-                dispatch(logoutUser())
-            } else if (err.response.data.errors) {
+            if (err.response.data.errors) {
                 toast.error("Please fill telegram username")
                 input.current.classList.add('red')
             } else if (err.response.data.error === 1) {
@@ -49,15 +40,11 @@ function AdminNewUserListCard ({ data, editable = false, addNew = null, onDeleti
     const onDelete = (id) => {
         loading(true)
         if (window.confirm('Are you sure you want to delete ' + data.telegram_username + '?')) {
-            axios.delete(process.env.REACT_APP_SERVER + `/api/userNew/delete?telegram_username=${data.telegram_username}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(_res => {
+            httpDelete(`/api/userNew/delete?telegram_username=${data.telegram_username}`).then(_res => {
                 toast.success("User " + data.telegram_username + " invite deleted")
                 onDeleting(data)
                 cardRef.current.classList.add('delete')
-            }, err => {
-                if (err.response.status === 401) {
-                    toast.warn("Authorization period expired")
-                    dispatch(logoutUser())
-                }
+            }, _err => {
                 toast.error("Error, try one more time")
                 loading(false)
             })

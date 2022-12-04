@@ -1,14 +1,8 @@
 import React, { useState, useRef } from 'react'
-import axios from "axios";
 import {toast} from "react-toastify";
-import {logoutUser} from "../../redux/actions/user";
-import {useDispatch, useSelector} from "react-redux";
+import { httpPost, httpDelete } from "../../utils/http"
 
 function AdminUserCard ({ data, onDeleting = null, key = null }) {
-
-    const dispatch = useDispatch()
-
-    const { userData } = useSelector(({ user }) => user);
 
     const [editError, setEditError] = useState(false)
     const cardRef = useRef()
@@ -29,18 +23,13 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
     }
 
     const onSave = () => {
-        console.log(dataForm)
-        axios.post(process.env.REACT_APP_SERVER + "/api/user/adminEdit", dataForm,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+        httpPost("/api/user/adminEdit", dataForm).then(res => {
             toast.success("User edited")
-            console.log(res.data.user)
             setDataForm(res.data.user)
             onCloseEdit()
         }, err => {
             setEditError(true)
-            if (err.response.status === 401) {
-                toast.warn("Authorization period expired")
-                dispatch(logoutUser())
-            } else if (err.response.data.errors) {
+            if (err.response.data.errors) {
                 toast.error("Please fill all required fields")
             } else if (err.response.data.error === 1) {
                 toast.warn("User with this " + err.response.data.value + " already exists")
@@ -55,15 +44,11 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
     const onDelete = (id) => {
         loading(true)
         if (window.confirm('Are you sure you want to delete ' + id + '?')) {
-            axios.delete(process.env.REACT_APP_SERVER + `/api/user/admin/delete?telegram_username=${id}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(_res => {
+            httpDelete(`/api/user/admin/delete?telegram_username=${id}`).then(_res => {
                 toast.success("User " + id + " deleted")
                 onDeleting(id)
                 cardRef.current.classList.add('delete')
-            }, err => {
-                if (err.response.status === 401) {
-                    toast.warn("Authorization period expired")
-                    dispatch(logoutUser())
-                }
+            }, _err => {
                 toast.error("Error, try one more time")
                 loading(false)
             })

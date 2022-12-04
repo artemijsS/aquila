@@ -25,10 +25,9 @@ module.exports = class userController {
     async checkTokenAndDisabled(userId, token) {
         const user = await User.findOne({_id: userId})
         if (user.disabled)
-            return false
+            return "Disabled"
         if (!user.JWTs.includes(token))
-            return false
-
+            return "blockedTOKEN"
         return true
     }
 
@@ -53,6 +52,9 @@ module.exports = class userController {
 
     async deleteJWT(userId, tokenPart, all = false) {
         const user = await User.findOne({_id: userId})
+
+        if (!user)
+            return false
 
         let tokens = []
         if (!all && user) {

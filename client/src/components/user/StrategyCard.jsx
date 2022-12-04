@@ -2,10 +2,9 @@ import React, {useState, useRef, useEffect} from 'react'
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated'
 import {useDispatch, useSelector} from "react-redux";
-import axios from "axios";
 import {toast} from "react-toastify";
-import {logoutUser} from "../../redux/actions/user";
 import {updateAllStrategies, updateMyStrategies} from "../../redux/actions/updates";
+import {httpGet, httpPost} from "../../utils/http"
 
 function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
 
@@ -48,42 +47,34 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
             return
         }
         if (window.confirm('Are you sure you want to delete ' + strategy.name + '?')) {
-            axios.post(process.env.REACT_APP_SERVER + `/api/userStrategies/disable`, {userStrategyId: strategy._id}, {headers: {authorization: `Bearer ${userData.token}`}})
-                .then(_res => {
-                    onDeleting()
-                    toast.success('Strategy successfully deleted!')
-                    dispatch(updateAllStrategies())
-                }, err => {
-                    if (err.response.status === 401) {
-                        toast.warn("Authorization period expired")
-                        dispatch(logoutUser())
-                    } else if (err.response.data.errors) {
-                        toast.error("Problems with data")
-                    } else if (err.response.data.error === 1) {
-                        toast.warn(err.response.data.msg)
-                    } else {
-                        toast.error("Error, try one more time")
-                    }
-                })
+            httpPost(`/api/userStrategies/disable`, {userStrategyId: strategy._id}).then(_res => {
+                onDeleting()
+                toast.success('Strategy successfully deleted!')
+                dispatch(updateAllStrategies())
+            }, err => {
+                if (err.response.data.errors) {
+                    toast.error("Problems with data")
+                } else if (err.response.data.error === 1) {
+                    toast.warn(err.response.data.msg)
+                } else {
+                    toast.error("Error, try one more time")
+                }
+            })
         }
     }
 
     const onAdd = (path) => {
-        axios.post(process.env.REACT_APP_SERVER + `/api/userStrategies/${path}`, {userStrategyId: strategy._id, crypto: strategy.crypto, amount: strategy.amount, leverage: strategy.leverage, strategyId: strategy._id},
-            {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
-                if (path === "add") {
-                    onDeleting()
-                    toast.success('Strategy successfully added!')
-                    dispatch(updateMyStrategies())
-                } else {
-                    toast.success('Strategy successfully edited!')
-                    setEdit(false)
-                }
+        httpPost(`/api/userStrategies/${path}`, {userStrategyId: strategy._id, crypto: strategy.crypto, amount: strategy.amount, leverage: strategy.leverage, strategyId: strategy._id}).then(_res => {
+            if (path === "add") {
+                onDeleting()
+                toast.success('Strategy successfully added!')
+                dispatch(updateMyStrategies())
+            } else {
+                toast.success('Strategy successfully edited!')
+                setEdit(false)
+            }
         }, err => {
-            if (err.response.status === 401) {
-                toast.warn("Authorization period expired")
-                dispatch(logoutUser())
-            } else if (err.response.data.errors) {
+            if (err.response.data.errors) {
                 toast.error("Please fill all required fields")
                 Object.keys(inputRefs).forEach(key => {
                     inputRefs[key].current.classList.remove('red')
@@ -103,13 +94,9 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
         let id = strategy._id
         if (own)
             id = strategy.strategyId
-        axios.get(process.env.REACT_APP_SERVER + `/api/crypto/getAll?strategyId=${id}`,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+        httpGet(`/api/crypto/getAll?strategyId=${id}`).then(res => {
             setCryptos(res.data)
-        }, err => {
-            if (err.response.status === 401) {
-                toast.warn("Authorization period expired")
-                dispatch(logoutUser())
-            }
+        }, _err => {
             toast.error("Error with loading strategy crypto data, try later")
         })
     }, [])

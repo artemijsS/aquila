@@ -1,16 +1,10 @@
-import React, {useState, useRef, useEffect} from 'react'
-import axios from "axios"
+import React, { useState, useRef } from 'react'
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated'
-import {toast} from "react-toastify";
-import {logoutUser} from "../../redux/actions/user";
-import {useDispatch, useSelector} from "react-redux";
+import { toast } from "react-toastify";
+import { httpPost, httpDelete } from "../../utils/http"
 
 function AdminStrategyCard ({ data, allInputData, editable = false, close = null, addNew = null, onDeleting = null, key = null }) {
-
-    const dispatch = useDispatch()
-
-    const { userData } = useSelector(({ user }) => user);
 
     const [editError, setEditError] = useState(false)
     const cardRef = useRef()
@@ -33,7 +27,7 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
     }
 
     const onSave = (path) => {
-        axios.post(process.env.REACT_APP_SERVER + "/api/strategies/" + path, dataForm,{headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+        httpPost("/api/strategies/" + path, dataForm).then(res => {
             if (path === "new") {
                 toast.success("New strategy added")
                 addNew(res.data.strategy)
@@ -47,10 +41,7 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
             if (path === "edit") {
                 setEditError(true)
             }
-            if (err.response.status === 401) {
-                toast.warn("Authorization period expired")
-                dispatch(logoutUser())
-            } else if (err.response.data.errors) {
+            if (err.response.data.errors) {
                 toast.error("Please fill all required fields")
                 Object.keys(inputRefs).forEach(key => {
                     if (!(!editable && (key === "name" || key === "urlId")))
@@ -79,15 +70,11 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
     const onDelete = (name) => {
         loading(true)
         if (window.confirm('Are you sure you want to delete ' + name + '?')) {
-            axios.delete(process.env.REACT_APP_SERVER + `/api/strategies/delete?name=${name}`, {headers: {authorization: `Bearer ${userData.token}`}}).then(_res => {
+            httpDelete(`/api/strategies/delete?name=${name}`).then(_res => {
                 toast.success("Strategy " + name + " deleted")
                 onDeleting(name)
                 cardRef.current.classList.add('delete')
-            }, err => {
-                if (err.response.status === 401) {
-                    toast.warn("Authorization period expired")
-                    dispatch(logoutUser())
-                }
+            }, _err => {
                 toast.error("Error, try one more time")
                 loading(false)
             })

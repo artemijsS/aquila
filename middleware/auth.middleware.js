@@ -19,8 +19,12 @@ module.exports = async (req, res, next) => {
 
         const tokenAndDisabledCheck = await usrContr.checkTokenAndDisabled(req.user.userId, token)
 
-        if (!tokenAndDisabledCheck) {
-            return res.status(401).json({ message: 'No auth' })
+        if (tokenAndDisabledCheck === "Disabled") {
+            return res.status(403).json({ message: 'Account disabled' })
+        }
+
+        if (tokenAndDisabledCheck === "blockedTOKEN") {
+            return res.status(404).json({ message: 'Session blocked' })
         }
 
         next();
