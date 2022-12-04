@@ -40,7 +40,7 @@ bot.onText(/\/start/, (msg) => {
                         bot.clearReplyListeners();
                     }).catch(err => {
                         const error_msg = errorMsg(err);
-                        bot.sendMessage(telegram_chatId, error_msg + ". Try one more time");
+                        bot.sendMessage(telegram_chatId, "⛔️⛔️⛔️ <b>ERROR</b> ⛔️⛔️⛔️\n\n" + "<i>"+error_msg+"</i>" + ". Try one more time", {"parse_mode": "HTML"});
                     })
                 })
             })
