@@ -3,15 +3,13 @@ import {Navigation, TwoFactorAuth} from '../components'
 import { Helmet } from "react-helmet";
 import ContentLoader from "react-content-loader";
 import {useDispatch, useSelector} from "react-redux";
-import axios from "axios";
-import {toast} from "react-toastify";
-import {logoutUser, setDisabledActionsBinance} from "../redux/actions/user";
+import { toast } from "react-toastify";
+import { setDisabledActionsBinance } from "../redux/actions/user";
+import { httpGet, httpPost } from "../utils/http"
 
 function SettingsPage () {
 
     const dispatch = useDispatch()
-
-    const { userData } = useSelector(({ user }) => user);
 
     const [user, setUser] = useState({})
     const [loading, setLoading] = useState(true)
@@ -22,6 +20,8 @@ function SettingsPage () {
     const [binanceApiKey, setBinanceApiKey] = useState('')
     const [binanceApiSecret, setBinanceApiSecret] = useState('')
 
+    const [passwordChange, setPasswordChange] = useState(false)
+
     const [_2FA, set2FA] = useState(false)
 
     const toggleNotificationsRef = useRef()
@@ -30,14 +30,10 @@ function SettingsPage () {
     const inputSecretRef = useRef()
 
     useEffect(() => {
-        axios.get(process.env.REACT_APP_SERVER + `/api/user/get`, {headers: {authorization: `Bearer ${userData.token}`}}).then(res => {
+        httpGet(`/api/user/get`).then(res => {
             setUser(res.data)
             setLoading(false)
-        }, err => {
-            if (err.response.status === 401) {
-                toast.warn("Authorization period expired")
-                dispatch(logoutUser())
-            }
+        }, _err => {
             toast.error("Error, try later")
         })
     }, [])
@@ -65,24 +61,19 @@ function SettingsPage () {
 
     const updateForToggles = (data, path, ref) => {
         setToggleLoading(toggle2FARef, ref, true)
-        axios.post(process.env.REACT_APP_SERVER + `/api/user/` + path, data, {headers: {authorization: `Bearer ${userData.token}`}})
-            .then(res => {
-                toast.success(res.data.msg)
+        httpPost(`/api/user/` + path, data).then(res => {
+            toast.success(res.data.msg)
+            setToggleLoading(toggle2FARef, ref, false)
+        }, err => {
+            if (err.response.status === 402) {
+                set2FA(true)
                 setToggleLoading(toggle2FARef, ref, false)
-            }, err => {
-                if (err.response.status === 401) {
-                    toast.warn("Authorization period expired")
-                    dispatch(logoutUser())
-                }
-                if (err.response.status === 402) {
-                    set2FA(true)
-                    setToggleLoading(toggle2FARef, ref, false)
-                    toast.error("2FA is required")
-                    return
-                }
-                setToggleLoading(toggle2FARef, ref, false)
-                toast.error("Error, try one more time")
-            })
+                toast.error("2FA is required")
+                return
+            }
+            setToggleLoading(toggle2FARef, ref, false)
+            toast.error("Error, try one more time")
+        })
     }
 
     const update2FA = (e) => {
@@ -97,48 +88,43 @@ function SettingsPage () {
 
     const onBinanceUpdate = (data, path, ref) => {
         setInputLoading(ref, true)
-        axios.post(process.env.REACT_APP_SERVER + `/api/user/` + path, data, {headers: {authorization: `Bearer ${userData.token}`}})
-            .then(res => {
-                toast.success(res.data.msg)
+        httpPost(`/api/user/` + path, data).then(res => {
+            toast.success(res.data.msg)
+            setInputLoading(ref, false)
+            if (path === "updateBinanceApiKey") {
+                if (user.BINANCE_API_SECRET)
+                    dispatch(setDisabledActionsBinance(false))
+                setUser({...user, BINANCE_API_KEY: true})
+                setBinanceApiKeyEdit(false)
+            }
+            else {
+                if (user.BINANCE_API_KEY)
+                    dispatch(setDisabledActionsBinance(false))
+                setUser({...user, BINANCE_API_SECRET: true})
+                setBinanceApiSecretEdit(false)
+            }
+        }, err => {
+            if (err.response.status === 402) {
+                set2FA(true)
                 setInputLoading(ref, false)
-                if (path === "updateBinanceApiKey") {
-                    if (user.BINANCE_API_SECRET)
-                        dispatch(setDisabledActionsBinance(false))
-                    setUser({...user, BINANCE_API_KEY: true})
-                    setBinanceApiKeyEdit(false)
-                }
-                else {
-                    if (user.BINANCE_API_KEY)
-                        dispatch(setDisabledActionsBinance(false))
-                    setUser({...user, BINANCE_API_SECRET: true})
-                    setBinanceApiSecretEdit(false)
-                }
-            }, err => {
-                if (err.response.status === 401) {
-                    toast.warn("Authorization period expired")
-                    dispatch(logoutUser())
-                }
-                if (err.response.status === 402) {
-                    set2FA(true)
-                    setInputLoading(ref, false)
-                    toast.error("2FA is required")
-                    return
-                }
-                if (err.response.data.errors) {
-                    setInputLoading(ref, false)
-                    ref.current.classList.add('red')
-                    return
-                }
-                if (err.response.status === 400) {
-                    setInputLoading(ref, false)
-                    dispatch(setDisabledActionsBinance(true))
-                    setUser({...user, BINANCE_API_SECRET: false, BINANCE_API_KEY: false})
-                    toast.error(err.response.data.msg)
-                    return
-                }
+                toast.error("2FA is required")
+                return
+            }
+            if (err.response.data.errors) {
                 setInputLoading(ref, false)
-                toast.error("Error, try one more time")
-            })
+                ref.current.classList.add('red')
+                return
+            }
+            if (err.response.status === 400) {
+                setInputLoading(ref, false)
+                dispatch(setDisabledActionsBinance(true))
+                setUser({...user, BINANCE_API_SECRET: false, BINANCE_API_KEY: false})
+                toast.error(err.response.data.msg)
+                return
+            }
+            setInputLoading(ref, false)
+            toast.error("Error, try one more time")
+        })
     }
 
     const onBinanceApiKeyUpdate = () => {
@@ -159,6 +145,16 @@ function SettingsPage () {
 
     const on2FAConfirm = () => {
         set2FA(false)
+    }
+
+    const onPasswordChange = () => {
+        setPasswordChange(true)
+        httpGet("/api/user/changePassword").then(res => {
+            toast.success(res.data)
+        }, err => {
+            setPasswordChange(false)
+            toast.error(err.response.data)
+        })
     }
 
     return (
@@ -235,7 +231,7 @@ function SettingsPage () {
                                 <div className="info">
                                     <div className="label">Password</div>
                                     <div className="value">
-                                        <button>Change</button>
+                                        <button onClick={onPasswordChange} disabled={passwordChange}>Change</button>
                                     </div>
                                 </div>
                             </div>

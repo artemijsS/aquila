@@ -3,6 +3,7 @@ const UserStrategies = require('../models/User_strategies');
 const UserStrategiesCrypto = require('../models/User_strategies_crypto');
 const jwt = require('jsonwebtoken');
 const Binance = require('node-binance-api');
+const bcrypt = require('bcryptjs');
 
 module.exports = class userController {
 
@@ -189,5 +190,42 @@ module.exports = class userController {
 
     }
 
+    async changePassWEB(userId) {
+        const Telegram = require('../utils/telegram.util')
+        const telegram = new Telegram()
+
+        const user = await User.findOne({ _id: userId })
+
+        if (!user)
+            return false
+
+        await telegram.sendChangePass(user.telegram_chatId)
+
+        return true
+    }
+
+    async changePassTelegram(chatId, password) {
+        return new Promise(async function(resolve, reject) {
+            try {
+                const user = await User.findOne({ telegram_chatId: chatId })
+
+                if (!user) {
+                    reject("User not found")
+                }
+
+                if (password.length < 6) {
+                    reject("Minimal length of password - 6 symbols. Try one more time")
+                }
+
+                user.password = await bcrypt.hash(password, 12)
+
+                await user.save()
+
+                resolve("Password successfully changed")
+            } catch (e) {
+                reject("Error, try one more time")
+            }
+        })
+    }
 
 };

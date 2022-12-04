@@ -2,6 +2,10 @@ const { bot } = require('../telegram/telegram')
 const browser = require('browser-detect');
 const requestIP = require('request-ip');
 const axios = require('axios');
+
+const usrController = require('../controllers/user.controller')
+const usrContr = new usrController
+
 const GEO_URL = 'https://ipgeolocation.abstractapi.com/v1/?api_key=' + process.env.API_GEO;
 
 module.exports = class Bot {
@@ -12,15 +16,21 @@ module.exports = class Bot {
 
 
     async sendMessage(chatId, msg) {
-        await this.bot.sendMessage(chatId, msg, {
+        return await this.bot.sendMessage(chatId, msg, {
             "parse_mode": "HTML",
         })
+    }
+
+    async sendSuccess(chatId, msg) {
+        const title = "✅✅✅ <b>SUCCESS</b> ✅✅✅\n\n"
+        const message = title + "<i>"+msg+"</i>"
+        await this.sendMessage(chatId, message)
     }
 
     async sendWithButton(chatId, msg, buttons) {
         const parse_mode = { "parse_mode": "HTML" }
         const options = {...parse_mode, reply_markup: { inline_keyboard: [ buttons ]}}
-        await this.bot.sendMessage(chatId, msg, options)
+        return await this.bot.sendMessage(chatId, msg, options)
     }
 
     async sendNotification(chatId, msg) {
@@ -52,6 +62,13 @@ module.exports = class Bot {
     async sendError(chatId, msg) {
         const title = "⛔️⛔️⛔️ <b>ERROR</b> ⛔️⛔️⛔️\n\n"
         const message = title + "<i>"+msg+"</i>"
+        await this.sendMessage(chatId, message)
+    }
+
+    async sendChangePass(chatId) {
+        const title = "❔ <b>How to change Password</b> ❔\n\n"
+        const msg = "<b>Use /changePassword command</b>"
+        const message = title + msg
         await this.sendMessage(chatId, message)
     }
 

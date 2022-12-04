@@ -9,7 +9,6 @@ export const httpGet = async (url) => {
         axios.get(process.env.REACT_APP_SERVER + url, { headers: { authorization: `Bearer ${token}` } }).then(res => {
             resolve(res)
         }, err => {
-            console.log(err)
             if (err.response.status === 401) {
                 toast.warn("Authorization period expired")
                 store.dispatch(logoutUser())

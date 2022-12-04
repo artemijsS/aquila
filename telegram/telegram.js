@@ -115,11 +115,52 @@ bot.on('callback_query', async function onCallbackQuery(callbackQuery) {
         text = msg.text + "\n\n⛔️⛔️  <b>Sessions closed on all devises</b>  ⛔️⛔️"
     }
 
+    if (action === 'CLOSE') {
+        bot.removeReplyListener(data)
+        text = msg.text + "\n\n🔐 <b>Closed</b> 🔐"
+    }
+
     try {
         await bot.editMessageText(text, opts);
     } catch {
         console.log("editMessageText bug")
     }
 });
+
+bot.onText(/\/changePassword/, async (msg) => {
+    const telegram_chatId = msg.chat.id;
+    const telegram_username = msg.chat.username;
+
+    const regCheck = await checkRegistration(telegram_chatId, telegram_username)
+    if (!regCheck) {
+        bot.sendMessage(telegram_chatId, "⛔️⛔️⛔️ <b>You are not registered!</b> ⛔️⛔️⛔️", {"parse_mode": "HTML"})
+        return
+    }
+
+    const title = "🗝 <b>Change Password</b> 🗝\n\n"
+    const p = "<b>Type your new password (WITH REPLY)</b>"
+    const message = title + p
+
+    bot.sendMessage(telegram_chatId, message, {parse_mode: "HTML"}).then(async val => {
+        const msg_id = val.message_id;
+
+        const replyToMessageListenerId = await bot.onReplyToMessage(telegram_chatId, msg_id, msg => {
+            const password = msg.text;
+
+            usrContr.changePassTelegram(telegram_chatId, password).then(res => {
+                bot.sendMessage(telegram_chatId, "✅✅✅ <b>SUCCESS</b> ✅✅✅\n\n" + "<i>"+res+"</i>", {"parse_mode": "HTML"})
+                bot.removeReplyListener(replyToMessageListenerId)
+                bot.editMessageText(message + "\n\n🔐 <b>Changed</b> 🔐", {chat_id: telegram_chatId, message_id: msg_id, parse_mode: "HTML"})
+            }, err => {
+                bot.sendMessage(telegram_chatId, "⛔️⛔️⛔️ <b>ERROR</b> ⛔️⛔️⛔️\n\n" + "<i>"+err+"</i>", {"parse_mode": "HTML"})
+            })
+        })
+
+        await bot.editMessageReplyMarkup({inline_keyboard: [[{ text: 'Close', callback_data: "CLOSE:" + replyToMessageListenerId}]]}, {
+            chat_id: telegram_chatId,
+            message_id: msg_id
+        });
+    })
+})
 
 module.exports = { bot };

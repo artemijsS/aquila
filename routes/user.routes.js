@@ -214,4 +214,22 @@ router.post('/updateBinanceApiSecret', auth, _2FA, [
         }
     })
 
+// api/user/changePassword
+router.get('/changePassword', auth,
+    async (req, res) => {
+        try {
+
+            const userId = req.user.userId
+
+            const changePass = await usrContr.changePassWEB(userId)
+            if (!changePass) {
+                return res.status(400).json("User not found")
+            }
+
+            res.json("Instruction was sent in a telegram")
+        } catch (e) {
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
 module.exports = router;
