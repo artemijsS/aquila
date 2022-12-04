@@ -49,4 +49,10 @@ module.exports = class Bot {
         await this.sendWithButton(chatId, message, buttons)
     }
 
+    async sendError(chatId, msg) {
+        const title = "⛔️⛔️⛔️ <b>ERROR</b> ⛔️⛔️⛔️\n\n"
+        const message = title + "<i>"+msg+"</i>"
+        await this.sendMessage(chatId, message)
+    }
+
 }

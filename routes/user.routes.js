@@ -49,7 +49,7 @@ router.get('/admin/get', auth, admin,
         }
     })
 
-// api/user/delete TODO
+// api/user/delete
 router.delete('/admin/delete', auth, admin,
     async (req, res) => {
         try {
@@ -61,7 +61,7 @@ router.delete('/admin/delete', auth, admin,
                 return res.status(400).json({error: 1, msg: "no telegram_username"})
             }
 
-            await User.deleteOne({ telegram_username })
+            await usrContr.deleteUser(telegram_username)
 
             res.json({telegram_username: telegram_username, msg: "deleted"})
         } catch (e) {

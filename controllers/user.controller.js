@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const UserStrategies = require('../models/User_strategies');
+const UserStrategiesCrypto = require('../models/User_strategies_crypto');
 const jwt = require('jsonwebtoken');
 const Binance = require('node-binance-api');
 
@@ -167,5 +169,25 @@ module.exports = class userController {
         await user.save()
         return [200, "Binance Api secret successfully updated"]
     }
+
+    async deleteUser(telegram_username) {
+        const Telegram = require('../utils/telegram.util')
+        const telegram = new Telegram()
+
+        const user = await User.findOne({ telegram_username })
+
+        const userStrategies = await UserStrategies.find({ userId: user._id })
+        userStrategies.map(async userStrategy => {
+            await UserStrategiesCrypto.deleteMany({ UserStrategiesId: userStrategy._id })
+        })
+
+        await UserStrategies.deleteMany({ userId: user._id })
+
+        await User.deleteOne({ telegram_username })
+
+        await telegram.sendError(user.telegram_chatId, "Your account has been deleted by the administration")
+
+    }
+
 
 };

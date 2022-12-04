@@ -100,7 +100,7 @@ router.post('/login',
             const user = await User.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') });
 
             if (!user) {
-                return res.status(400).json({ message: "User not found" })
+                return res.status(400).json({ message: "Incorrect data" })
             }
 
             const isMatch = await bcrypt.compare(password, user.password)
@@ -189,7 +189,7 @@ router.post('/checkUserRegister', [
         // user access check
         let userInvite = await UserInvite.findOne({ telegram_username: new RegExp(`^${telegram_username}$`, 'i') })
         if (!userInvite) {
-            return res.status(400).json({error: 1, message: "You do not have access to register"})
+            return res.status(400).json({error: 1, message: "⛔️⛔️⛔️ <b>You do not have access to register</b> ⛔️⛔️⛔️"})
         }
 
         res.json(false);
