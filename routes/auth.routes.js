@@ -23,7 +23,7 @@ const router = Router();
 router.post('/register',
     [
         check('telegram_username', 'Incorrect username').notEmpty(),
-        check('password', 'Minimal length - 6 symbols').isLength({ min: 6 }),
+        check('password', 'Minimal length - 8 symbols').isLength({ min: 8 }),
         check('telegram_chatId', 'Incorrect telegram chatId').notEmpty(),
     ],
     async (req, res) => {
@@ -39,6 +39,12 @@ router.post('/register',
             }
 
             const { telegram_username, password, telegram_chatId } = req.body;
+
+            const passRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/
+
+            if (!passRegex.test(password)) {
+                return res.status(400).json({ message: "Password must contain at least one letter one number and one special character (@$!%*#?&)" })
+            }
 
             // username check
             let candidate = await User.findOne({ telegram_username })

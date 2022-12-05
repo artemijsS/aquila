@@ -35,7 +35,7 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
 
     const onEdit = () => {
         if (userData.disabledActionsBinance) {
-            toast.warn("You need add Binance API key and API secret first in settings!")
+            toast.warn("You need to add Binance API key and API secret first in settings!")
             return
         }
         setEdit(true)
@@ -43,7 +43,7 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
 
     const onDelete = () => {
         if (userData.disabledActionsBinance) {
-            toast.warn("You need add Binance API key and API secret first in settings!")
+            toast.warn("You need add to Binance API key and API secret first in settings!")
             return
         }
         if (window.confirm('Are you sure you want to delete ' + strategy.name + '?')) {

@@ -8,10 +8,10 @@ const checkRegistration = async (telegram_chatId, telegram_username) => {
 
 const errorMsg = (err) => {
     let error_msg;
-    if (err.response.data['errors']) {
+    if (err.response?.data['errors']) {
         error_msg = err.response.data['errors'][0].msg;
     } else {
-        error_msg = err.response.data.message;
+        error_msg = err.response?.data.message;
     }
     return error_msg;
 }

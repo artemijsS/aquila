@@ -213,8 +213,12 @@ module.exports = class userController {
                     reject("User not found")
                 }
 
-                if (password.length < 6) {
-                    reject("Minimal length of password - 6 symbols. Try one more time")
+                if (password.length < 8) {
+                    reject("Minimal length of password - 8 symbols. Try one more time")
+                }
+
+                if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password)) {
+                    reject("Password must contain at least one letter one number and one special character (@$!%*#?&)")
                 }
 
                 user.password = await bcrypt.hash(password, 12)

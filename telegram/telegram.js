@@ -25,7 +25,7 @@ bot.onText(/\/start/, (msg) => {
 
     checkRegistration(telegram_chatId, telegram_username).then(isRegistered => {
         if (!isRegistered) {
-            bot.sendMessage(telegram_chatId, '🎯 <b>aquila welcomes you</b> 🎯\n\n<i>You have to register first!</i>\n<b>Type your password (WITH REPLY)</b>', {"parse_mode": "HTML"}).then(val => {
+            bot.sendMessage(telegram_chatId, '🎯 <b>aquila welcomes you</b> 🎯\n\n<i>You have to register first!\n\nMinimum 8 characters, at least one letter, one number and one special character (@$!%*#?&)</i>\n\n<b>Type your password (WITH REPLY)</b>', {"parse_mode": "HTML"}).then(val => {
                 const msg_id = val.message_id;
 
                 bot.onReplyToMessage(telegram_chatId, msg_id, msg => {
@@ -38,6 +38,11 @@ bot.onText(/\/start/, (msg) => {
                     }).then(_res => {
                         bot.sendMessage(telegram_chatId, "🎯 <b>Registration successful</b> 🎯\n\n<i>Congratulations, you can now log in to the aquila system</i>\n<b>Your username - " + telegram_username + "</b>", {"parse_mode": "HTML"});
                         bot.clearReplyListeners();
+
+                        for (let i = msg_id + 1; i <= msg.message_id; i++) {
+                            bot.deleteMessage(telegram_chatId, i)
+                        }
+                        bot.editMessageText('🎯 <b>aquila welcomes you</b> 🎯\n\n<i>You have to register first!</i>\n<b>DONE</b>', {chat_id: telegram_chatId, message_id: msg_id, parse_mode: "HTML"})
                     }).catch(err => {
                         const error_msg = errorMsg(err);
                         bot.sendMessage(telegram_chatId, "⛔️⛔️⛔️ <b>ERROR</b> ⛔️⛔️⛔️\n\n" + "<i>"+error_msg+"</i>" + ". Try one more time", {"parse_mode": "HTML"});
@@ -138,7 +143,7 @@ bot.onText(/\/changePassword/, async (msg) => {
     }
 
     const title = "🗝 <b>Change Password</b> 🗝\n\n"
-    const p = "<b>Type your new password (WITH REPLY)</b>"
+    const p = "<i>Minimum 8 characters, at least one letter, one number and one special character (@$!%*#?&)</i>\n\n<b>Type your new password (WITH REPLY)</b>"
     const message = title + p
 
     bot.sendMessage(telegram_chatId, message, {parse_mode: "HTML"}).then(async val => {
@@ -151,6 +156,10 @@ bot.onText(/\/changePassword/, async (msg) => {
                 bot.sendMessage(telegram_chatId, "✅✅✅ <b>SUCCESS</b> ✅✅✅\n\n" + "<i>"+res+"</i>", {"parse_mode": "HTML"})
                 bot.removeReplyListener(replyToMessageListenerId)
                 bot.editMessageText(message + "\n\n🔐 <b>Changed</b> 🔐", {chat_id: telegram_chatId, message_id: msg_id, parse_mode: "HTML"})
+
+                for (let i = msg_id + 1; i <= msg.message_id; i++) {
+                    bot.deleteMessage(telegram_chatId, i)
+                }
             }, err => {
                 bot.sendMessage(telegram_chatId, "⛔️⛔️⛔️ <b>ERROR</b> ⛔️⛔️⛔️\n\n" + "<i>"+err+"</i>", {"parse_mode": "HTML"})
             })
