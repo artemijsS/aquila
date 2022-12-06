@@ -11,13 +11,7 @@ const strCrContr = new strategiesCryptoController
 
 module.exports = class strategies {
 
-    async addNew(urlId, name, description, percentage, source, cryptoArr) {
-
-        // urlId check
-        // let candidate = await Strategy.findOne({ urlId })
-        // if (candidate) {
-        //     return {error: 1, value: "urlId"}
-        // }
+    async addNew(urlId, name, description, source, cryptoArr) {
 
         // name check
         const candidate = await Strategy.findOne({ name })
@@ -29,7 +23,6 @@ module.exports = class strategies {
             urlId,
             name,
             description,
-            percentage,
             source
         });
 
@@ -42,7 +35,7 @@ module.exports = class strategies {
         return strategy
     }
 
-    async edit(name, urlId, description, percentage, source, cryptoArr) {
+    async edit(name, urlId, description, source, cryptoArr) {
 
         // urlId check
         let strategy = await Strategy.findOne({ name })
@@ -52,7 +45,6 @@ module.exports = class strategies {
 
         strategy.urlId = urlId
         strategy.description = description
-        strategy.percentage = percentage
         strategy.source = source
 
         const strategyCrypto = await strCrContr.edit(strategy._id, cryptoArr)
@@ -65,6 +57,10 @@ module.exports = class strategies {
         const res = await this.get(1, 0, strategy.name)
 
         return res[0]
+    }
+
+    async getOne(name, urlId) {
+        return Strategy.findOne({ name, urlId })
     }
 
     async get(size, page, search, one = false) {
@@ -94,7 +90,7 @@ module.exports = class strategies {
                     as: "crypto"
                 }
             },
-            { $project: {_id: 1, urlId: 1, name: 1, description: 1, percentage: 1, source: 1, crypto: "$crypto.data"} },
+            { $project: {_id: 1, urlId: 1, name: 1, description: 1, source: 1, crypto: "$crypto.data"} },
             { $sort: {name: 1} },
             { $skip: size * page },
             { $limit: size }
@@ -136,7 +132,7 @@ module.exports = class strategies {
                     as: "crypto"
                 }
             },
-            { $project: {_id: 1, urlId: 1, name: 1, description: 1, percentage: 1, source: 1, crypto: "$crypto.data"} },
+            { $project: {_id: 1, urlId: 1, name: 1, description: 1, source: 1, crypto: "$crypto.data"} },
             { $sort: {name: 1} },
             { $skip: size * page },
             { $limit: size }
@@ -172,7 +168,7 @@ module.exports = class strategies {
 
         userStrategies.map(async userStrategy => {
             const user = await User.findOne({ _id: userStrategy.userId })
-            await telegram.sendNotification(user.telegram_chatId, "Be aware,\n" + name + " strategy deleted by Admin\n!!! Please check stock market !!!")
+            await telegram.sendNotification(user.telegram_chatId, "Be aware,\n<b>" + name + "</b> strategy deleted by Admin\n\n❗️❗️ Please check stock market ❗️❗️")
         })
     }
 

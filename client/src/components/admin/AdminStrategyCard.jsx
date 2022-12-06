@@ -12,7 +12,6 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
         name: useRef(),
         urlId: useRef(),
         source: useRef(),
-        percentage: useRef(),
         crypto: useRef(),
         description: useRef()
     }
@@ -134,16 +133,6 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
                             <input ref={inputRefs.source} defaultValue={dataForm.source} onChange={changeHandler} name="source" type="text"/>
                             :
                             dataForm.source
-                        }
-                    </div>
-                </div>
-                <div className="data">
-                    <div className="key">Percentage</div>
-                    <div className="value">
-                        {edit ?
-                            <input ref={inputRefs.percentage} defaultValue={dataForm.percentage} onChange={changeHandler} name="percentage" type="text"/>
-                            :
-                            dataForm.percentage
                         }
                     </div>
                 </div>

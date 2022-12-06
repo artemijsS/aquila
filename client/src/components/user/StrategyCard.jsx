@@ -117,10 +117,6 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
                     <div className="value">{strategy.source}</div>
                 </div>
                 <div className="data">
-                    <div className="key">Percentage</div>
-                    <div className="value">{strategy.percentage}</div>
-                </div>
-                <div className="data">
                     <div className="key">Crypto</div>
                     <div className="value">
                         <div ref={inputRefs.crypto} className={edit ? "select" : ""}>

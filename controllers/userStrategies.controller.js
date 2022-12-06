@@ -148,7 +148,6 @@ module.exports = class userStrategies {
                     urlId: "$strategy.urlId",
                     name: "$strategy.name",
                     description: "$strategy.description",
-                    percentage: "$strategy.percentage",
                     source: "$strategy.source",
                     rating: "$strategy.rating",
                     strategyId: "$strategy._id",
@@ -183,6 +182,33 @@ module.exports = class userStrategies {
     async getName(id) {
         const strategy = await UserStrategies.findOne({ _id: id }).populate('strategyId', 'name').select({_id: 0, name: '$strategyId.name'}).lean()
         return strategy.strategyId.name
+    }
+
+    async getByStrategyIdAndCrypto(strategyId, cryptoId) {
+        return UserStrategies.aggregate([
+            { $match: { strategyId } },
+            {
+                $lookup: {
+                    from: "user_strategies_cryptos",
+                    localField: "_id",
+                    foreignField: "UserStrategiesId",
+                    pipeline: [{$match: { cryptoId } }, {$project: { disabled: 1, _id: 1 }}],
+                    as: "crypto"
+                }
+            },
+            { $unwind: '$crypto' },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    pipeline: [{$project: { _id: 1, telegram_username: 1, telegram_chatId: 1, disabled: 1, BINANCE_API_KEY: 1, BINANCE_API_SECRET: 1 }}],
+                    as: "user"
+                }
+            },
+            { $unwind: '$user' },
+            { $project: { _id: 1, disabled: 1, amount: 1, leverage: 1, user: 1, crypto: 1 } }
+        ])
     }
 
 };

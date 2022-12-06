@@ -72,4 +72,23 @@ module.exports = class strategyCrypto {
         return true
     }
 
+    async get(strategyId, crypto) {
+        return StrategyCrypto.aggregate([
+            { $match: { strategyId } },
+            {
+                $lookup: {
+                    from: "cryptos",
+                    localField: "cryptoId",
+                    foreignField: "_id",
+                    pipeline: [
+                        { $match: { name: crypto } }
+                    ],
+                    as: "crypto"
+                }
+            },
+            { $unwind: "$crypto" },
+            { $project: { name: "$crypto.name", _id: "$crypto._id" } }
+        ]).then(res => res.length > 0 ? res[0] : false )
+    }
+
 };

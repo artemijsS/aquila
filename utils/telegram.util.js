@@ -72,4 +72,15 @@ module.exports = class Bot {
         await this.sendMessage(chatId, message)
     }
 
+    async sendSignal(chatId, strategyName, entryPrice, amount, leverage, tp, sl) {
+        const title = "💎💎💎 <b>SIGNAL</b> 💎💎💎\n\n"
+        const msg = "<b>Strategy - " + strategyName + "</b>\n\n"
+            + "<b>Take Profit - " + tp + "\nStop Loss - " + sl + "</b>\n\n"
+            + "<i>Entry price - " + entryPrice
+            + "\nAmount - " + amount
+            + "\nLeverage - " + leverage + "</i>"
+        const message = title + msg
+        return await this.sendMessage(chatId, message)
+    }
+
 }

@@ -19,7 +19,7 @@ function AdminPage () {
             <div className="wrapper full-screen">
                 <Navigation activeRoute="admin"/>
                 <div className="main-window">
-                    <Block title={"Strategies"} objectForm={{urlId: '', name: '', description: '', percentage: '', source: '', crypto: []}} urlPath={"strategies"} getAllInputPath={"crypto"}>
+                    <Block title={"Strategies"} objectForm={{urlId: '', name: '', description: '', source: '', crypto: []}} urlPath={"strategies"} getAllInputPath={"crypto"}>
                         <AdminStrategyCard/>
                     </Block>
                     <Block title={"Users"} objectForm={{telegram_username: '', telegram_chatId: '', role: '', twoFAuthentication: '', disabled: '', notifications: ''}} urlPath={"user/admin"} newElement={false}>

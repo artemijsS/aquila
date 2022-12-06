@@ -16,7 +16,6 @@ router.post('/new', auth, admin, [
         check('urlId', 'Incorrect urlId').notEmpty(),
         check('name', 'Incorrect name').notEmpty(),
         check('description', 'Incorrect description').notEmpty(),
-        check('percentage', 'Incorrect percentage').notEmpty(),
         check('source', 'Incorrect source').notEmpty(),
         check('crypto', 'Incorrect crypto').notEmpty().isArray()
     ],
@@ -24,9 +23,9 @@ router.post('/new', auth, admin, [
     async (req, res) => {
         try {
 
-            const { urlId, name, description, percentage, source, crypto } = req.body;
+            const { urlId, name, description, source, crypto } = req.body;
 
-            const strategy = await strContr.addNew(urlId, name, description, percentage, source, crypto)
+            const strategy = await strContr.addNew(urlId, name, description, source, crypto)
 
             if (strategy.error) {
                 return res.status(400).json(strategy)
@@ -85,7 +84,6 @@ router.post('/edit', auth, admin, [
         check('name', 'Incorrect name').notEmpty(),
         check('urlId', 'Incorrect urlId').notEmpty(),
         check('description', 'Incorrect description').notEmpty(),
-        check('percentage', 'Incorrect percentage').notEmpty(),
         check('source', 'Incorrect source').notEmpty(),
         check('crypto', 'Incorrect crypto').notEmpty().isArray(),
     ],
@@ -93,9 +91,9 @@ router.post('/edit', auth, admin, [
     async (req, res) => {
         try {
 
-            const { name, urlId, description, percentage, source, crypto } = req.body;
+            const { name, urlId, description, source, crypto } = req.body;
 
-            const strategy = await strContr.edit(name, urlId, description, percentage, source, crypto)
+            const strategy = await strContr.edit(name, urlId, description, source, crypto)
 
             if (strategy.error) {
                 return res.status(400).json(strategy)
