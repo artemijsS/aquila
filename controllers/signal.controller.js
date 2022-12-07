@@ -1,8 +1,4 @@
 const Signal = require('../models/Signal');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const Telegram = require('../utils/telegram.util')
-const telegram = new Telegram()
 
 
 module.exports = class signal {
@@ -14,6 +10,10 @@ module.exports = class signal {
         await signal.save()
 
         return true
+    }
+
+    async findLast(userId, strategyName) {
+        return Signal.findOne({ userId, strategyName }, {}, { sort: { 'created_at' : -1 } })
     }
 
 };

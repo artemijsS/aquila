@@ -192,7 +192,18 @@ module.exports = class userStrategies {
                     from: "user_strategies_cryptos",
                     localField: "_id",
                     foreignField: "UserStrategiesId",
-                    pipeline: [{$match: { cryptoId } }, {$project: { disabled: 1, _id: 1 }}],
+                    pipeline: [
+                        { $match: { cryptoId } }, {$project: { disabled: 1, _id: 1, cryptoId: 1 } },
+                        {
+                            $lookup: {
+                                from: "cryptos",
+                                localField: "cryptoId",
+                                foreignField: "_id",
+                                as: "data"
+                            }
+                        },
+                        { $unwind: "$data" }
+                        ],
                     as: "crypto"
                 }
             },

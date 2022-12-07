@@ -41,7 +41,7 @@ router.post('/default', [
             const { alertMessage, side, price, action, marketPosition } = strategy
 
             const [tp, sl] = alertMessage.split(";")
-            console.log(tp, sl)
+
             const strategyDB = await strContr.getOne(strategyName, "/default")
 
             if (!strategyDB) {
@@ -62,11 +62,9 @@ router.post('/default', [
                         continue
                     }
 
-                    //проверить есть ли открытый такой сигнал, если есть закрыть его
+                    const [entryPrice, telegramMsgId] = await binance.createNormalOrder(userStrategy, crypto, tp, sl, strategyName, action)
 
-                    const [entryPrice, telegramMsgId] = await binance.createNormalOrder(userStrategy, tp, sl, strategyName)
-
-                    await sigContr.create(userStrategy.user._id, strategyName, exchange, userStrategy.amount, userStrategy.leverage, entryPrice, telegramMsgId)
+                    // await sigContr.create(userStrategy.user._id, strategyName, exchange, userStrategy.amount, userStrategy.leverage, entryPrice, telegramMsgId)
 
 
                 }
