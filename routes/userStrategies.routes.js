@@ -109,12 +109,11 @@ router.post('/disable', auth, userBinanceActionsCheck, [
                 return res.status(400).json(userStrategies)
             }
 
-            const name = await userStrContr.getName(userStrategies._id)
-
             res.json({userStrategies})
-            req.notificationMessage = name + " strategy deleted!"
+            req.notificationMessage = userStrategies.name + " strategy " + userStrategies.msg
             next()
         } catch (e) {
+            console.log(e)
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
     }, telegramNotification)

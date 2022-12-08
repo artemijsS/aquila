@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const Strategy = require('../models/Strategy');
+const Signal = require('../models/Signal');
 const UserStrategies = require('../models/User_strategies');
 const UserStrategiesCrypto = require('../models/User_strategies_crypto');
 
@@ -84,11 +85,25 @@ module.exports = class userStrategies {
             return {error: 1, msg: "Strategy does not exist"}
         }
 
-        userStrategy.disabled = true
+        const strategy = await Strategy.findOne({ _id: userStrategy.strategyId })
+        const lastSignal = await Signal.findOne({ userId, strategyName: strategy.name, closed: false })
+        let msg
+        if (lastSignal) {
+            userStrategy.disabled = true
+            await userStrategy.save()
+            await usrStrCrContr.disableAllCrypto(userId, userStrategy._id, strategy)
+            msg = "disabled and the strategy will be deleted when the open signals are closed!"
+        } else {
+            await this.deleteUserStrategy(userStrategyId, userId)
+            msg = "deleted!"
+        }
 
-        await userStrategy.save()
+        return {name: strategy.name, msg}
+    }
 
-        return userStrategy
+    async deleteUserStrategy(_id, userId) {
+        await usrStrCrContr.deleteAllCrypto(_id)
+        await UserStrategies.deleteOne({ _id, userId })
     }
 
     async get(userId, size, page, search) {
@@ -237,5 +252,16 @@ module.exports = class userStrategies {
 
         await userStrategy.save()
     }
+
+    // async delete(_id) {
+    //     const userStrategiesCrypto = await UserStrategiesCrypto.find({ UserStrategiesId: _id })
+    //
+    //     if (userStrategiesCrypto.length > 0) {
+    //         return false
+    //     }
+    //
+    //     await UserStrategies.deleteOne({ _id })
+    //     return true
+    // }
 
 };

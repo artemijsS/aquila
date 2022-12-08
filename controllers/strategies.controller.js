@@ -47,7 +47,7 @@ module.exports = class strategies {
         strategy.description = description
         strategy.source = source
 
-        const strategyCrypto = await strCrContr.edit(strategy._id, cryptoArr)
+        const strategyCrypto = await strCrContr.edit(strategy._id, cryptoArr, name)
         if (!strategyCrypto) {
             return {error: 2, value: "crypto"}
         }

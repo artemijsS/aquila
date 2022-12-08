@@ -1,6 +1,8 @@
 const UserStrategies = require('../models/User_strategies');
 const UserStrategiesCrypto = require('../models/User_strategies_crypto');
-const StrategyCrypto = require('../models/Strategy_crypto');
+const Crypto = require('../models/Crypto');
+const Signal = require('../models/Signal');
+const Strategy = require('../models/Strategy');
 
 Array.prototype.diff = function(a)
 {
@@ -37,8 +39,20 @@ module.exports = class userStrategiesCrypto {
             try {
                 const candidate = await UserStrategiesCrypto.findOne({UserStrategiesId: userStrategyId, cryptoId: cr})
                 if (candidate) {
-                    candidate.disabled = true
-                    await candidate.save()
+                    const userStrategy = await UserStrategies.findOne({ userStrategyId })
+                    const strategy = await Strategy.findOne({ _id: userStrategy.strategyId })
+                    const crypto = await Crypto.findOne({ _id: cr })
+                    const cryptoName = crypto.name
+                    const strategyName = strategy.name
+                    const userId = userStrategy.userId
+
+                    const lastSignal = await Signal.findOne({ crypto: cryptoName, strategyName, userId, closed: false })
+                    if (lastSignal) {
+                        candidate.disabled = true
+                        await candidate.save()
+                    } else {
+                        await UserStrategiesCrypto.deleteOne({ UserStrategiesId: userStrategyId, cryptoId: cr })
+                    }
                 }
             } catch (e) {
                 return false
@@ -72,6 +86,43 @@ module.exports = class userStrategiesCrypto {
             if (userStrategiesCrypto) {
                 userStrategiesCrypto.disabled = true
                 await userStrategiesCrypto.save()
+                const crypto = await Crypto.findOne({_id: cryptoId})
+                const cryptoName = crypto.name
+                const strategy = await Strategy.findOne({_id: strategyId})
+                const strategyName = strategy.name
+                const lastSignal = await Signal.findOne({
+                    crypto: cryptoName,
+                    userId: userStrategy.userId,
+                    strategyName
+                }, {}, {sort: {'created_at': -1}})
+                if (!lastSignal) {
+                    await this.deleteCrypto(userStrategy._id, cryptoId)
+                } else if (lastSignal.closed) {
+                    await this.deleteCrypto(userStrategy._id, cryptoId)
+                }
+            }
+        })
+    }
+
+    async deleteCrypto(UserStrategiesId, cryptoId) {
+        await UserStrategiesCrypto.deleteOne({ UserStrategiesId, cryptoId })
+    }
+
+
+    async deleteAllCrypto(UserStrategiesId) {
+        await UserStrategiesCrypto.deleteMany({ UserStrategiesId })
+    }
+
+    async disableAllCrypto(userId, UserStrategiesId, strategy) {
+        const cryptos = await UserStrategiesCrypto.find({ UserStrategiesId })
+        cryptos.map(async userStrategiesCrypto => {
+            const crypto = await Crypto.findOne({ _id: userStrategiesCrypto.cryptoId })
+            const lastSignal = await Signal.findOne({ userId, strategyName: strategy.name, crypto: crypto.name, closed: false })
+            if (lastSignal) {
+                const usrStrCr = await UserStrategiesCrypto.findOne({ UserStrategiesId, cryptoId: crypto._id })
+                usrStrCr.disabled = true
+            } else {
+                await this.deleteCrypto(UserStrategiesId, crypto._id)
             }
         })
     }

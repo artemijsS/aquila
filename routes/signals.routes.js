@@ -60,7 +60,7 @@ router.post('/default', [
 
             if (action === "LONG" || action === "SHORT") {
                 for (let userStrategy of userStrategies) {
-                    if (userStrategy.disabled || userStrategy.crypto.disabled || userStrategy.user.disabled) {
+                    if (userStrategy.user.disabled) {
                         continue
                     }
 
@@ -73,12 +73,15 @@ router.post('/default', [
                         continue
                     }
 
-                    await sigContr.createDefault(userStrategy.user._id, strategyName, crypto, exchange, userStrategy.amount, userStrategy.leverage, action, entryPrice, telegramMsgId)
+                    if (entryPrice && telegramMsgId)
+                        await sigContr.createDefault(userStrategy.user._id, strategyName, crypto, exchange, userStrategy.amount, userStrategy.leverage, action, entryPrice, telegramMsgId)
                 }
 
                 const strategyUpdated = await strContr.getOne(strategyName, "/default")
-                if (strategyUpdated.profitability !== strategyDB.profitability)
+                if (strategyUpdated.profitability !== strategyDB.profitability) {
                     await strContr.updateState(strategyUpdated._id, strategyUpdated.profitability >= strategyDB.profitability)
+                    await strCrContr.checkForDisabled(strategyDB._id, cryptoSupports._id, strategyName)
+                }
 
             } else {
                 const profits = []
@@ -100,6 +103,9 @@ router.post('/default', [
                 if (allProfit !== 0) {
                     await strContr.changeStat(strategyDB._id, allProfit)
                 }
+
+                await strCrContr.checkForDisabled(strategyDB._id, cryptoSupports._id, strategyName)
+
             }
 
             res.json('NICE')

@@ -12,6 +12,9 @@ const strContr = new strategyController
 const userStrategyController = require('../controllers/userStrategies.controller')
 const usrStrContr = new userStrategyController
 
+const userStrategyCryptoController = require('../controllers/userStrategiesCrypto.controller')
+const usrStrCrContr = new userStrategyCryptoController
+
 module.exports = class BinanceUtil {
 
     async createNormalPosition(data, crypto, tp, sl, strategyName, side, strategyId) {
@@ -35,6 +38,16 @@ module.exports = class BinanceUtil {
                 await telegram.sendSignalExit(data.user.telegram_chatId, strategyName, crypto, closedSignal.profit, lastSignal.telegramMsgId)
                 await strContr.addProfit(strategyId, closedSignal.profit)
                 await usrStrContr.changeStat(data._id, closedSignal.profit)
+
+                if (data.crypto.disabled || data.disabled) {
+
+                    if (data.crypto.disabled)
+                        await usrStrCrContr.deleteCrypto(data._id, data.crypto.cryptoId)
+                    if (data.disabled)
+                        await usrStrContr.disable(data.user._id, data._id)
+                    return [0, 0]
+                }
+
             } else {
                 await telegram.sendError(data.user.telegram_chatId, "Strategy - <b>" + strategyName + "</b>\nPosition already opened by you or different strategy")
                 throw "Position already opened by you or different strategy"
@@ -132,6 +145,14 @@ module.exports = class BinanceUtil {
                 const closedSignal = await sigContr.closeDefault(lastSignal._id, exitPrice)
                 await telegram.sendSignalExit(data.user.telegram_chatId, strategyName, crypto, closedSignal.profit, lastSignal.telegramMsgId)
                 await usrStrContr.changeStat(data._id, closedSignal.profit)
+
+                if (data.crypto.disabled) {
+                    await usrStrCrContr.deleteCrypto(data._id, data.crypto.cryptoId)
+                }
+                if (data.disabled) {
+                    await usrStrContr.disable(data.user._id, data._id)
+                }
+
                 return closedSignal.profit
             }
         } else {

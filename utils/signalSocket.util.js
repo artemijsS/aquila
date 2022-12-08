@@ -4,21 +4,27 @@ const io = require('../socket').get();
 module.exports = class signalSocket {
 
     sendSignal(userId, signal) {
-        Object.keys(userSessions[userId]).map(socket => {
-            io.to(socket).emit('newSignal', signal)
-        })
+        try {
+            Object.keys(userSessions[userId]).map(socket => {
+                io.to(socket).emit('newSignal', signal)
+            })
+        } catch (e) {}
     }
 
     closeSignal(userId, signal) {
-        Object.keys(userSessions[userId]).map(socket => {
-            io.to(socket).emit('closeSignal', signal)
-        })
+        try {
+            Object.keys(userSessions[userId]).map(socket => {
+                io.to(socket).emit('closeSignal', signal)
+            })
+        } catch (e) {}
     }
 
     deleteSignal(userId, signalId) {
-        Object.keys(userSessions[userId]).map(socket => {
-            io.to(socket).emit('deleteSignal', signalId)
-        })
+        try {
+            Object.keys(userSessions[userId]).map(socket => {
+                io.to(socket).emit('deleteSignal', signalId)
+            })
+        } catch (e) {}
     }
 
 };
