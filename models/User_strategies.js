@@ -8,6 +8,8 @@ const schema = new Schema({
     leverage: {type: Number, required: true},
     workedTimes: {type: Number, required: true, default: 0},
     avgProfitability: {type: Number, required: true, default: 0},
+    profitability: {type: Number, required: true, default: 0},
+    countOfWins: {type: Number, required: true, default: 0},
     percentOfWins: {type: Number, required: true, default: 0}
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 

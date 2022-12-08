@@ -8,6 +8,7 @@ const schema = new Schema({
     workedTimes: {type: Number, required: true, default: 0},
     avgProfitability: {type: Number, required: true, default: 0},
     profitability: {type: Number, required: true, default: 0},
+    countOfWins: {type: Number, required: true, default: 0},
     percentOfWins: {type: Number, required: true, default: 0}
 })
 

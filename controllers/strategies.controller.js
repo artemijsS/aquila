@@ -173,4 +173,44 @@ module.exports = class strategies {
     }
 
 
+    async changeStat(_id, allProfit) {
+        const strategy = await Strategy.findOne({ _id })
+        if (allProfit === 0) {
+            return
+        }
+        strategy.workedTimes = strategy.workedTimes + 1
+        strategy.profitability = strategy.profitability + allProfit
+        strategy.avgProfitability = Number(strategy.profitability / strategy.workedTimes).toFixed(2)
+        if (allProfit > 0) {
+            strategy.countOfWins = strategy.countOfWins + 1
+        }
+        strategy.percentOfWins = Number(strategy.countOfWins / strategy.workedTimes).toFixed(2)
+
+        await strategy.save()
+    }
+
+    async addProfit(_id, profit) {
+        const strategy = await Strategy.findOne({ _id })
+        if (profit === 0) {
+            return
+        }
+
+        strategy.profitability = strategy.profitability + profit
+
+        await strategy.save()
+    }
+
+    async updateState(_id, win) {
+        const strategy = await Strategy.findOne({ _id })
+
+        strategy.workedTimes = strategy.workedTimes + 1
+        strategy.avgProfitability = Number(strategy.profitability / strategy.workedTimes).toFixed(2)
+        if (win) {
+            strategy.countOfWins = strategy.countOfWins + 1
+        }
+        strategy.percentOfWins = Number(strategy.countOfWins / strategy.workedTimes).toFixed(2)
+
+        await strategy.save()
+    }
+
 };

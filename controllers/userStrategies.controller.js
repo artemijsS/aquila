@@ -222,4 +222,20 @@ module.exports = class userStrategies {
         ])
     }
 
+    async changeStat(_id, profit) {
+        const userStrategy = await UserStrategies.findOne({ _id })
+        if (profit === 0) {
+            return
+        }
+        userStrategy.workedTimes = userStrategy.workedTimes + 1
+        userStrategy.profitability = userStrategy.profitability + profit
+        userStrategy.avgProfitability = Number(userStrategy.profitability / userStrategy.workedTimes).toFixed(2)
+        if (profit > 0) {
+            userStrategy.countOfWins = userStrategy.countOfWins + 1
+        }
+        userStrategy.percentOfWins = Number(userStrategy.countOfWins / userStrategy.workedTimes).toFixed(2)
+
+        await userStrategy.save()
+    }
+
 };

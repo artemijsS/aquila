@@ -4,6 +4,9 @@ const validation = require('../middleware/validation.middleware');
 const Binance = require('../utils/binance.util')
 const binance = new Binance
 
+const Telegram = require('../utils/telegram.util')
+const telegram = new Telegram()
+
 const strategiesController = require('../controllers/strategies.controller')
 const strContr = new strategiesController
 
@@ -38,7 +41,7 @@ router.post('/default', [
                 return res.status(400).json("Validator issue")
             }
 
-            const { alertMessage, side, price, action, marketPosition } = strategy
+            const { alertMessage, action } = strategy
 
             const [tp, sl] = alertMessage.split(";")
 
@@ -54,7 +57,6 @@ router.post('/default', [
             }
 
             const userStrategies = await usrStrContr.getByStrategyIdAndCrypto(strategyDB._id, cryptoSupports._id)
-            console.log(userStrategies)
 
             if (action === "LONG" || action === "SHORT") {
                 for (let userStrategy of userStrategies) {
@@ -62,15 +64,44 @@ router.post('/default', [
                         continue
                     }
 
-                    const [entryPrice, telegramMsgId] = await binance.createNormalOrder(userStrategy, crypto, tp, sl, strategyName, action)
+                    let entryPrice, telegramMsgId
+                    try {
+                        [entryPrice, telegramMsgId] = await binance.createNormalPosition(userStrategy, crypto, tp, sl, strategyName, action, strategyDB._id)
+                    } catch (e) {
+                        console.log(userStrategy.user.telegram_username + "  " + e)
+                        await telegram.sendError(userStrategy.user.telegram_chatId, "Please check the exchange because an unexpected error has occurred")
+                        continue
+                    }
 
-                    // await sigContr.create(userStrategy.user._id, strategyName, exchange, userStrategy.amount, userStrategy.leverage, entryPrice, telegramMsgId)
+                    await sigContr.createDefault(userStrategy.user._id, strategyName, crypto, exchange, userStrategy.amount, userStrategy.leverage, action, entryPrice, telegramMsgId)
+                }
 
+                const strategyUpdated = await strContr.getOne(strategyName, "/default")
+                if (strategyUpdated.profitability !== strategyDB.profitability)
+                    await strContr.updateState(strategyUpdated._id, strategyUpdated.profitability >= strategyDB.profitability)
 
+            } else {
+                const profits = []
+                for (let userStrategy of userStrategies) {
+
+                    try {
+                        profits.push(await binance.closeNormalPosition(userStrategy, crypto, strategyName, action.split(' ')[1]))
+                    } catch (e) {
+                        await telegram.sendError(userStrategy.user.telegram_chatId, "Please check the exchange because an unexpected error has occurred")
+                        console.log(userStrategy.user.telegram_username + "  " + e)
+                    }
+                }
+
+                let allProfit = 0;
+                for (let profit of profits) {
+                    allProfit+=profit
+                }
+
+                if (allProfit !== 0) {
+                    await strContr.changeStat(strategyDB._id, allProfit)
                 }
             }
 
-            // bot.sendMessage("617330875", "test")
             res.json('NICE')
         } catch (e) {
             console.log(e)

@@ -21,6 +21,13 @@ module.exports = class Bot {
         })
     }
 
+    async sendMessageWithReply(chatId, msg, replyMsgId) {
+        return await this.bot.sendMessage(chatId, msg, {
+            "parse_mode": "HTML",
+            "reply_to_message_id": replyMsgId
+        })
+    }
+
     async sendSuccess(chatId, msg) {
         const title = "✅✅✅ <b>SUCCESS</b> ✅✅✅\n\n"
         const message = title + "<i>"+msg+"</i>"
@@ -59,10 +66,13 @@ module.exports = class Bot {
         await this.sendWithButton(chatId, message, buttons)
     }
 
-    async sendError(chatId, msg) {
+    async sendError(chatId, msg, replyId = false) {
         const title = "⛔️⛔️⛔️ <b>ERROR</b> ⛔️⛔️⛔️\n\n"
         const message = title + "<i>"+msg+"</i>"
-        await this.sendMessage(chatId, message)
+        if (!replyId)
+            await this.sendMessage(chatId, message)
+        else
+            await this.sendMessageWithReply(chatId, message, replyId)
     }
 
     async sendChangePass(chatId) {
@@ -81,6 +91,15 @@ module.exports = class Bot {
             + "\nLeverage - " + leverage + "</i>"
         const message = title + msg
         return await this.sendMessage(chatId, message)
+    }
+
+    async sendSignalExit(chatId, strategyName, profit, msgId) {
+        const status = profit > 0 ? "✅✅✅" : "❌❌❌"
+        const title = `${status} <b>SIGNAL EXIT</b> ${status}\n\n`
+        const msg = "<b>Strategy - " + strategyName + "</b>\n\n"
+            + "<b>Profit: " + profit + " USDT</b>"
+        const message = title + msg
+        return await this.sendMessageWithReply(chatId, message, msgId)
     }
 
 }
