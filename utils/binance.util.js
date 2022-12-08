@@ -32,7 +32,7 @@ module.exports = class BinanceUtil {
                 }
 
                 const closedSignal = await sigContr.closeDefault(lastSignal._id, exitPrice)
-                await telegram.sendSignalExit(data.user.telegram_chatId, strategyName, closedSignal.profit, lastSignal.telegramMsgId)
+                await telegram.sendSignalExit(data.user.telegram_chatId, strategyName, crypto, closedSignal.profit, lastSignal.telegramMsgId)
                 await strContr.addProfit(strategyId, closedSignal.profit)
                 await usrStrContr.changeStat(data._id, closedSignal.profit)
             } else {
@@ -77,7 +77,7 @@ module.exports = class BinanceUtil {
             await telegram.sendError(data.user.telegram_chatId, "Strategy - <b>" + strategyName + "</b>\nError with stop loss or take profit\nBe careful and check it in exchange")
         }
 
-        const msg = await telegram.sendSignal(data.user.telegram_chatId, strategyName, order.avgPrice, data.amount, data.leverage, tp, sl)
+        const msg = await telegram.sendSignal(data.user.telegram_chatId, strategyName, crypto, side, order.avgPrice, data.amount, data.leverage, tp, sl)
         return [order.avgPrice, msg.message_id]
     }
 
@@ -130,7 +130,7 @@ module.exports = class BinanceUtil {
                 }
 
                 const closedSignal = await sigContr.closeDefault(lastSignal._id, exitPrice)
-                await telegram.sendSignalExit(data.user.telegram_chatId, strategyName, closedSignal.profit, lastSignal.telegramMsgId)
+                await telegram.sendSignalExit(data.user.telegram_chatId, strategyName, crypto, closedSignal.profit, lastSignal.telegramMsgId)
                 await usrStrContr.changeStat(data._id, closedSignal.profit)
                 return closedSignal.profit
             }

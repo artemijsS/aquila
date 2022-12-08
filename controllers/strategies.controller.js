@@ -184,7 +184,7 @@ module.exports = class strategies {
         if (allProfit > 0) {
             strategy.countOfWins = strategy.countOfWins + 1
         }
-        strategy.percentOfWins = Number(strategy.countOfWins / strategy.workedTimes).toFixed(2)
+        strategy.percentOfWins = Number(strategy.countOfWins / strategy.workedTimes).toFixed(2) * 100
 
         await strategy.save()
     }
@@ -208,7 +208,7 @@ module.exports = class strategies {
         if (win) {
             strategy.countOfWins = strategy.countOfWins + 1
         }
-        strategy.percentOfWins = Number(strategy.countOfWins / strategy.workedTimes).toFixed(2)
+        strategy.percentOfWins = Number(strategy.countOfWins / strategy.workedTimes).toFixed(2) * 100
 
         await strategy.save()
     }

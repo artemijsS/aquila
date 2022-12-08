@@ -233,7 +233,7 @@ module.exports = class userStrategies {
         if (profit > 0) {
             userStrategy.countOfWins = userStrategy.countOfWins + 1
         }
-        userStrategy.percentOfWins = Number(userStrategy.countOfWins / userStrategy.workedTimes).toFixed(2)
+        userStrategy.percentOfWins = Number(userStrategy.countOfWins / userStrategy.workedTimes).toFixed(2) * 100
 
         await userStrategy.save()
     }

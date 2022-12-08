@@ -82,9 +82,10 @@ module.exports = class Bot {
         await this.sendMessage(chatId, message)
     }
 
-    async sendSignal(chatId, strategyName, entryPrice, amount, leverage, tp, sl) {
+    async sendSignal(chatId, strategyName, crypto, side, entryPrice, amount, leverage, tp, sl) {
         const title = "💎💎💎 <b>SIGNAL</b> 💎💎💎\n\n"
-        const msg = "<b>Strategy - " + strategyName + "</b>\n\n"
+        const msg = "<b>Strategy - " + strategyName + "\nCrypto - " + crypto + "</b>\n\n"
+            + "<b>Side - " + side + "</b>\n\n"
             + "<b>Take Profit - " + tp + "\nStop Loss - " + sl + "</b>\n\n"
             + "<i>Entry price - " + entryPrice
             + "\nAmount - " + amount
@@ -93,10 +94,10 @@ module.exports = class Bot {
         return await this.sendMessage(chatId, message)
     }
 
-    async sendSignalExit(chatId, strategyName, profit, msgId) {
+    async sendSignalExit(chatId, strategyName, crypto, profit, msgId) {
         const status = profit > 0 ? "✅✅✅" : "❌❌❌"
         const title = `${status} <b>SIGNAL EXIT</b> ${status}\n\n`
-        const msg = "<b>Strategy - " + strategyName + "</b>\n\n"
+        const msg = "<b>Strategy - " + strategyName + "\nCrypto - " + crypto + "</b>\n\n"
             + "<b>Profit: " + profit + " USDT</b>"
         const message = title + msg
         return await this.sendMessageWithReply(chatId, message, msgId)
