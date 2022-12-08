@@ -1,6 +1,8 @@
 const Signal = require('../models/Signal');
 const Telegram = require('../utils/telegram.util')
 const telegram = new Telegram()
+const signalSocket = require('../utils/signalSocket.util')
+const sigSocket = new signalSocket()
 
 module.exports = class signal {
 
@@ -9,7 +11,7 @@ module.exports = class signal {
             userId, strategyName, crypto, exchange, amount, leverage, position, entryPrice, telegramMsgId
         })
         await signal.save()
-
+        sigSocket.sendSignal(userId, signal)
         return true
     }
 
@@ -29,12 +31,15 @@ module.exports = class signal {
         signal.closed = true
 
         await signal.save()
+        sigSocket.closeSignal(signal.userId, signal)
         return signal
     }
 
     async deleteSignal(_id, strategyName, chatId, msgReplay) {
+        const signal = await Signal.findOne({ _id })
         await Signal.deleteOne({ _id })
         await telegram.sendError(chatId, strategyName + " signal deleted because of error or your own position!", msgReplay)
+        sigSocket.deleteSignal(signal.userId, _id)
     }
 
 };

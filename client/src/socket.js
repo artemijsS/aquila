@@ -14,4 +14,16 @@ socket.on('logout', () => {
     store.dispatch(logoutUser(true))
 })
 
+socket.on('newSignal', (signal) => {
+    console.log(signal)
+})
+
+socket.on('closeSignal', (signal) => {
+    console.log(signal)
+})
+
+socket.on('deleteSignal', (signalId) => {
+    console.log(signalId)
+})
+
 export default socket;
