@@ -1,4 +1,5 @@
 const { Schema, model, Types } = require('mongoose')
+const mongooseTimezone = require('mongoose-timezone');
 
 const schema = new Schema({
     userId: {type: Types.ObjectId, ref: 'User', required: true},
@@ -14,5 +15,10 @@ const schema = new Schema({
     profit: {type: Number},
     telegramMsgId: {type: Number}
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
+
+schema.plugin(mongooseTimezone, {
+    paths: ['created_at', 'updated_at'],  // array of fields to convert
+    timezone: 'Europe/Riga'  // timezone to convert to
+});
 
 module.exports = model('Signal', schema)

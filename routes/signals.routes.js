@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { check } = require('express-validator')
+const auth = require('../middleware/auth.middleware');
 const validation = require('../middleware/validation.middleware');
 const Binance = require('../utils/binance.util')
 const binance = new Binance
@@ -18,6 +19,8 @@ const usrStrContr = new userStrategiesController
 
 const signalController = require('../controllers/signal.controller')
 const sigContr = new signalController
+
+const Page = require('../utils/page.util')
 
 const router = Router();
 
@@ -114,5 +117,33 @@ router.post('/default', [
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }
 })
+
+// api/signals/actions/get
+router.post('/actions/get', auth, [
+        check('search', 'Incorrect search').isString(),
+        check('cryptos', 'Incorrect crypto').isArray(),
+        check('sort', 'Incorrect sort').isString(),
+        check('position', 'Incorrect position').isString(),
+    ],
+    validation,
+    async (req, res) => {
+        try {
+            const userId = req.user.userId
+            const { search, cryptos, sort, position } = req.body;
+
+            const page = new Page(req, 6)
+
+            const signals = await sigContr.get(userId, search, sort, position, cryptos, page.Page, page.Size)
+            const count = await sigContr.getCount(userId, search, position, cryptos)
+
+            page.setData(signals)
+            page.setCount(count)
+
+            res.json(page.pageResponse())
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
 
 module.exports = router;

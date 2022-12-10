@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Signal = require('../models/Signal');
 const Telegram = require('../utils/telegram.util')
 const telegram = new Telegram()
@@ -40,6 +41,83 @@ module.exports = class signal {
         await Signal.deleteOne({ _id })
         await telegram.sendError(chatId, strategyName + " signal deleted because of error or your own position!", msgReplay)
         sigSocket.deleteSignal(signal.userId, _id)
+    }
+
+    async get(userId, search, sort, position, cryptos, page, size) {
+        const aggregation = [
+            {$match: {userId: mongoose.mongo.ObjectID(userId)}},
+            {$match: {strategyName: {$regex: search, $options: 'i'}}},
+            {$match: {position: {$regex: position, $options: 'i'}}}
+        ]
+        if (cryptos.length > 0) {
+            aggregation.push({$match: {crypto: { $in: cryptos }}})
+        }
+
+        let sortAggregation = {$sort: { created_at: -1}}
+        if (sort) {
+            sortAggregation = {$sort: { [sort]: -1, created_at: -1 }}
+        }
+
+        aggregation.push(sortAggregation)
+
+        const yesterday = new Date();  // current date
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        aggregation.push(
+            {
+                $addFields: {
+                    created_at: {
+                        $cond: [
+                            // Check if the created_at date is today
+                            {
+                                $eq: [
+                                    { $dateToString: { format: '%Y-%m-%d', date: '$created_at' } },
+                                    { $dateToString: { format: '%Y-%m-%d', date: new Date() } }
+                                ]
+                            },
+                            // If created_at date is today, concatenate the time with " today"
+                            { $concat: [{ $dateToString: { format: '%H:%M', date: '$created_at' }}, ' today'] },
+                            // If created_at date is not today, check if it is yesterday
+                            {
+                                $cond: [
+                                    // Check if the created_at date is yesterday
+                                    {
+                                        $eq: [
+                                            { $dateToString: { format: '%Y-%m-%d', date: '$created_at' } },
+                                            { $dateToString: { format: '%Y-%m-%d', date: yesterday } }
+                                        ]
+                                    },
+                                    // If created_at date is yesterday, concatenate the time with " yesterday"
+                                    { $concat: [{ $dateToString: { format: '%H:%M', date: '$created_at' }}, ' yesterday'] },
+                                    // If created_at date is not today or yesterday, return the date and time in the format "HH:MM DD/MM/YYYY"
+                                    { $dateToString: { format: '%H:%M %d/%m/%Y', date: '$created_at' } }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        )
+
+        aggregation.push({$skip: size * page}, {$limit: size})
+
+        return Signal.aggregate(aggregation)
+    }
+
+    async getCount(userId, search, position, cryptos) {
+
+        const aggregation = [
+            {$match: {userId: mongoose.mongo.ObjectID(userId)}},
+            {$match: {strategyName: {$regex: search, $options: 'i'}}},
+            {$match: {position: {$regex: position, $options: 'i'}}}
+        ]
+        if (cryptos.length > 0) {
+            aggregation.push({$match: {crypto: { $in: cryptos }}})
+        }
+
+        aggregation.push({ $count: "count" })
+
+        return await Signal.aggregate(aggregation).then(count => count[0] ? count[0].count : 0)
     }
 
 };

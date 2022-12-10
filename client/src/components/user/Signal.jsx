@@ -1,20 +1,18 @@
-import React, {useState, useRef, useEffect} from 'react'
-import Select from 'react-select'
+import React, { useState } from 'react'
 import {httpGet, httpPost} from "../../utils/http"
 
-function Signal ({ signal, key = null }) {
+function Signal ({ signal }) {
 
-    const [open, setOpen] = useState(signal.closed)
-
-    useEffect(() => {
-        console.log(1)
-    }, [])
+    const [open, setOpen] = useState(!signal.closed)
 
     return (
-        <div className={"card signal " + (open ? "open" : "")} key={key}>
+        <div className={"card signal " + (open ? "open" : "")}>
+            {open &&
+                <span className="open-signal"/>
+            }
             <div className="cubes">
                 {!open &&
-                    <span className={signal.profit > 0 ? "cube profit plus" : "cube profit minus"}>{signal.profit > 0 ? "+ " : "- "}{Math.abs(signal.profit)}$</span>
+                    <span className={signal.profit > 0 ? "cube profit plus" : "cube profit minus"}>{signal.profit < 0 && "- "}{signal.profit > 0 && "+ "}{Math.abs(signal.profit)}$</span>
                 }
                 <span className={"cube leverage " + signal.position}>{signal.leverage}x</span>
                 <span className={"cube position " + signal.position}>{signal.position}</span>
@@ -33,7 +31,7 @@ function Signal ({ signal, key = null }) {
                     <h3>Exit - {signal.exitPrice}$</h3>
                 }
             </div>
-            <div className="time">09/12/2022 15:43</div>
+            <div className="time">{signal.created_at}</div>
         </div>
 
     )
