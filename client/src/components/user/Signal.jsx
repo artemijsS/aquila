@@ -5,47 +5,36 @@ import {httpGet, httpPost} from "../../utils/http"
 function Signal ({ signal, key = null }) {
 
     const [open, setOpen] = useState(signal.closed)
-    const [position, setPosition] = useState(signal.position)
-    const [leverage, setLeverage] = useState(signal.leverage)
 
     useEffect(() => {
-        console.log(position)
+        console.log(1)
     }, [])
 
     return (
-        <>
-        {open ?
-            <div className={"card signal open"} key={key}>
-                <span className="open-signal"/>
-                <div className="cubes">
-                    <span className={"cube leverage " + position}>{leverage}x</span>
-                    <span className={"cube position " + position}>{position}</span>
-                </div>
-                <div className="strategy">
-                    <h1>test</h1>
-                </div>
-                <div className="data">
-                    <h3>XRP</h3>
-                    <h3>6$</h3>
-                </div>
-                <div className="time">09/12/2022 15:43</div>
+        <div className={"card signal " + (open ? "open" : "")} key={key}>
+            <div className="cubes">
+                {!open &&
+                    <span className={signal.profit > 0 ? "cube profit plus" : "cube profit minus"}>{signal.profit > 0 ? "+ " : "- "}{Math.abs(signal.profit)}$</span>
+                }
+                <span className={"cube leverage " + signal.position}>{signal.leverage}x</span>
+                <span className={"cube position " + signal.position}>{signal.position}</span>
             </div>
-            :
-            <div className={"card signal"} key={key}>
-                <div className="cubes">
-                    <span className={"cube leverage " + position}>{leverage}x</span>
-                    <span className={"cube position " + position}>{position}</span>
-                </div>
-                <div className="strategy">
-                    <h1>test</h1>
-                </div>
-                <div className="data">
-                    <h3>Profit: test</h3>
-                </div>
-                <div className="time">09/12/2022 15:43</div>
+            {!open &&
+                <div className={signal.profit > 0 ? "profitBg plus" : "profitBg minus"}/>
+            }
+            <div className="strategy">
+                <h1>test</h1>
             </div>
-        }
-        </>
+            <div className="data">
+                <h3>XRP</h3>
+                <h3>{signal.amount}$</h3>
+                <h3>Entry - {signal.entryPrice}$</h3>
+                {!open &&
+                    <h3>Exit - {signal.exitPrice}$</h3>
+                }
+            </div>
+            <div className="time">09/12/2022 15:43</div>
+        </div>
 
     )
 }

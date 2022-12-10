@@ -237,7 +237,7 @@ code {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  min-width: 369px;
+  /*min-width: 369px;*/
   flex: 1;
   min-height: 330px;
   background-color: white;
@@ -387,10 +387,19 @@ code {
   width: 60px;
   text-align: center;
 }
+.signal .cubes .cube.profit {
+  text-align: center;
+}
 .signal .cubes .cube.position.LONG, .signal .cubes .cube.leverage.LONG {
   background-color: rgba(0, 255, 0, 0.5);
 }
 .signal .cubes .cube.position.SHORT, .signal .cubes .cube.leverage.SHORT {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+.signal .cubes .cube.profit.plus {
+  background-color: rgba(0, 255, 0, 0.5);
+}
+.signal .cubes .cube.profit.minus {
   background-color: rgba(255, 0, 0, 0.5);
 }
 .signal .time {
@@ -399,6 +408,51 @@ code {
   bottom: 5px;
   font-size: 12px;
   color: grey;
+}
+.signal .profitBg {
+  position: absolute;
+  height: 100%;
+  width: 20%;
+  left: 0;
+  border-top-left-radius: 1.1rem;
+  border-bottom-left-radius: 1.1rem;
+  z-index: 0;
+}
+.signal .profitBg.plus {
+  background: linear-gradient(to right, lightgreen, rgba(255, 255, 255, 0));
+}
+.signal .profitBg.minus {
+  background: linear-gradient(to right, lightcoral, rgba(255, 255, 255, 0));
+}
+
+@media screen and (max-width: 900px) {
+  .signal {
+    font-size: 0.9em;
+  }
+  .signal .cubes {
+    font-size: 0.9em;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .signal .cubes .cube.profit {
+    position: absolute;
+    left: 5%;
+    z-index: 2;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .block .cards.list .card.signal .strategy h1 {
+    margin-top: 40px;
+  }
+  .block .cards.list .card.signal .data {
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 25px;
+  }
+  .block .cards.list .card.signal .data h3 {
+    margin: 5px auto;
+  }
 }
 
 .block .down {

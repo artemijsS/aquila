@@ -55,7 +55,7 @@ function SignalBlock () {
             <div className="search">
                 <label><svg width="30" height="30" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" ><title>search</title><path d="M220 370q26 0 48-8 23-8 42-22l80 80 30-30-80-80q14-19 22-42 8-22 8-48-1-65-43-107-42-42-107-43-64 1-106 43-42 42-44 107 2 64 44 106 42 42 106 44l0 0z m-110-150q1-48 32-78 30-31 78-32 48 1 78 32 31 30 32 78-1 48-32 78-30 31-78 32-48-1-78-32-31-30-32-78l0 0z" /></svg>
                 </label>
-                <input type="text" placeholder="Search" onChange={e => setSearch({...search, search: e.target.value})}/>
+                <input type="text" placeholder="Search by strategy" onChange={e => setSearch({...search, search: e.target.value})}/>
                 <div className="selects">
                     <Select
                         placeholder= 'Sort by'
@@ -84,11 +84,11 @@ function SignalBlock () {
                 </div>
             </div>
             <div className={"cards list"}>
-                <Signal signal={{leverage: 1, position: "LONG", closed: true}}/>
-                <Signal signal={{leverage: 1, position: "SHORT", closed: true}}/>
-                <Signal signal={{leverage: 1, position: "LONG", closed: false}}/>
-                <Signal signal={{leverage: 1, position: "LONG", closed: false}}/>
-                <Signal signal={{leverage: 1, position: "LONG", closed: false}}/>
+                <Signal signal={{amount: 6, entryPrice: 0.37, leverage: 1, position: "LONG", closed: true}}/>
+                <Signal signal={{amount: 6, entryPrice: 0.37, leverage: 1, position: "SHORT", closed: true}}/>
+                <Signal signal={{profit: 2.53, exitPrice: 0.40, amount: 6, entryPrice: 0.37, leverage: 1, position: "LONG", closed: false}}/>
+                <Signal signal={{profit: 2.53, exitPrice: 0.40, amount: 6, entryPrice: 0.37, leverage: 1, position: "SHORT", closed: false}}/>
+                <Signal signal={{profit: 2.53, exitPrice: 0.40, amount: 6, entryPrice: 0.37, leverage: 1, position: "LONG", closed: false}}/>
             </div>
             <div className="down">
                 <div className="load-more">
