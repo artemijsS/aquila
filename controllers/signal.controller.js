@@ -16,6 +16,28 @@ module.exports = class signal {
         return true
     }
 
+    async createTestOpenSignal() {
+        const signal = {
+            userId: "638df2d094a63e8d3f0abfb6",
+            strategyName: 'test',
+            crypto: 'XRP',
+            exchange: 'BINANCE',
+            closed: false,
+            amount: 6,
+            leverage: 1,
+            position: 'LONG',
+            entryPrice: 0.3858,
+            telegramMsgId: 933,
+            _id: "6396381cbf05eab99e5d6fb1",
+            created_at: "2022-12-11T22:05:48.534Z",
+            updated_at: "2022-12-11T20:05:48.534Z",
+            __v: 0
+        }
+
+        sigSocket.sendSignal("638df2d094a63e8d3f0abfb6", signal)
+        return true
+    }
+
     async findLast(userId, strategyName) {
         return Signal.findOne({ userId, strategyName }, {}, { sort: { 'created_at' : -1 } })
     }

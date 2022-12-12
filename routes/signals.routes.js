@@ -118,6 +118,21 @@ router.post('/default', [
         }
 })
 
+// api/signals/testOpenSignal
+router.post('/testOpenSignal',
+    async (req, res) => {
+        try {
+
+            await sigContr.createTestOpenSignal()
+
+            res.json('NICE')
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
+
 // api/signals/actions/get
 router.post('/actions/get', auth, [
         check('search', 'Incorrect search').isString(),
