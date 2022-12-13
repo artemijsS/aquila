@@ -47,6 +47,9 @@ app.use('/api/userStrategies', require('./routes/userStrategies.routes'));
 // crypto
 app.use('/api/crypto', require('./routes/crypto.routes'));
 
+// overview
+app.use('/api/overview', require('./routes/overview.routes'));
+
 //**************************
 //  REACT APP
 //**************************

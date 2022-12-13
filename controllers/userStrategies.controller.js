@@ -253,15 +253,4 @@ module.exports = class userStrategies {
         await userStrategy.save()
     }
 
-    // async delete(_id) {
-    //     const userStrategiesCrypto = await UserStrategiesCrypto.find({ UserStrategiesId: _id })
-    //
-    //     if (userStrategiesCrypto.length > 0) {
-    //         return false
-    //     }
-    //
-    //     await UserStrategies.deleteOne({ _id })
-    //     return true
-    // }
-
 };

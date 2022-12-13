@@ -21,7 +21,7 @@ function Signal ({ signal }) {
                 <div className={signal.profit > 0 ? "profitBg plus" : "profitBg minus"}/>
             }
             <div className="strategy">
-                <h1>test</h1>
+                <h1>{signal.strategyName}</h1>
             </div>
             <div className="data">
                 <h3>XRP</h3>
