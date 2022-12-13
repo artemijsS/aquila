@@ -71,8 +71,10 @@ router.post('/default', [
                     try {
                         [entryPrice, telegramMsgId] = await binance.createNormalPosition(userStrategy, crypto, tp, sl, strategyName, action, strategyDB._id)
                     } catch (e) {
-                        console.log(userStrategy.user.telegram_username + "  " + e)
-                        await telegram.sendError(userStrategy.user.telegram_chatId, "Please check the exchange because an unexpected error has occurred")
+                        if (e !== "no") {
+                            console.log(userStrategy.user.telegram_username + "  " + e)
+                            await telegram.sendError(userStrategy.user.telegram_chatId, "Please check the exchange because an unexpected error has occurred")
+                        }
                         continue
                     }
 

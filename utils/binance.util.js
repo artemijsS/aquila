@@ -19,8 +19,15 @@ module.exports = class BinanceUtil {
 
     async createNormalPosition(data, crypto, tp, sl, strategyName, side, strategyId) {
         crypto = crypto + "USDT"
-        const API_KEY = jwt.verify(data.user.BINANCE_API_KEY, process.env.JWT_SECRET)
-        const API_SECRET = jwt.verify(data.user.BINANCE_API_SECRET, process.env.JWT_SECRET)
+        let API_KEY, API_SECRET
+        try {
+            API_KEY = jwt.verify(data.user.BINANCE_API_KEY, process.env.JWT_SECRET)
+            API_SECRET = jwt.verify(data.user.BINANCE_API_SECRET, process.env.JWT_SECRET)
+        } catch (e) {
+            await telegram.sendError(data.user.telegram_chatId, "Strategy - <b>" + strategyName + "\nBinance api key and api secret error</b>")
+            console.log(data.user.telegram_username + "  " + e)
+            throw "no"
+        }
 
         const positionAmount = await this.checkOpenPosition(crypto, API_KEY, API_SECRET)
         if (positionAmount) {
@@ -50,7 +57,7 @@ module.exports = class BinanceUtil {
 
             } else {
                 await telegram.sendError(data.user.telegram_chatId, "Strategy - <b>" + strategyName + "</b>\nPosition already opened by you or different strategy")
-                throw "Position already opened by you or different strategy"
+                throw "no"
             }
         }
 
@@ -58,6 +65,8 @@ module.exports = class BinanceUtil {
             APIKEY: API_KEY,
             APISECRET: API_SECRET
         })
+
+        await this.prepareToSignal(binance, crypto, data.leverage)
 
         const price = await binance.futuresMarkPrice(crypto).then(res => res.markPrice)
         const quantityWithoutPrecision = (data.amount * data.leverage) / price
@@ -162,6 +171,15 @@ module.exports = class BinanceUtil {
         }
 
         return 0
+    }
+
+    async prepareToSignal(binance, crypto, leverage, dualMode = false) {
+        if (dualMode)
+            await binance.futuresChangePositionSideDual(true)
+        else
+            await binance.futuresChangePositionSideDual(false)
+
+        await binance.futuresLeverage( crypto, leverage )
     }
 
 }
