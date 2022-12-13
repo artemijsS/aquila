@@ -1,5 +1,5 @@
 import React from 'react'
-import { Navigation } from '../components'
+import { Navigation, OverviewBlock } from '../components'
 import { Helmet } from "react-helmet";
 
 function OverviewPage () {
@@ -13,7 +13,7 @@ function OverviewPage () {
             <div className="wrapper full-screen">
                 <Navigation activeRoute="overview"/>
                 <div className="main-window">
-
+                    <OverviewBlock/>
                 </div>
             </div>
         </div>

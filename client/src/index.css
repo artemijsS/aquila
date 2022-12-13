@@ -516,7 +516,76 @@ code {
   cursor: not-allowed;
 }
 
-
+/*                  OVERVIEW*/
+.block .cards.min-gap {
+  gap: 50px 70px;
+}
+.block .cards .card.fixed {
+  max-width: 320px;
+  min-width: 320px;
+  justify-content: flex-start;
+}
+.block .cards .card.fixed.full {
+  min-width: 100%;
+}
+.block .cards .card.fixed .name {
+  margin-bottom: 20px;
+}
+.block .cards .card.fixed .info {
+  gap: 20px;
+}
+.block .cards .card.fixed .info .data .key {
+  text-align: center;
+  position: relative;
+  align-self: center;
+}
+.block .cards .card.fixed .info .data .key.big {
+  height: 150px;
+}
+.block .cards .card.fixed .info .data .key.big span {
+  height: 95px;
+  position: absolute;
+  font-size: 95px;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+}
+.block .cards .card.fixed .info .data .value.big {
+  font-size: 3rem;
+}
+.block .cards .card.fixed .info .data .value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  align-self: center;
+}
+.block .cards .card.fixed .info.left .data .key {
+  font-size: 1.2rem;
+  text-align: left;
+}
+.block .cards .card.fixed .info.left .data .key.small {
+  color: grey;
+  margin-left: 20px;
+  font-size: 0.9rem;
+  align-self: center;
+}
+.block .cards .card.fixed .info.left .data .value.small {
+  font-size: 0.9rem;
+  flex: 0.5;
+}
+.win {
+  position: absolute;
+  color: green;
+  font-size: 25px;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: auto;
+  content: "";
+}
 /*                  NAVIGATION*/
 .navigation {
   display: flex;

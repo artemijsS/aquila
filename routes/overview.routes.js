@@ -6,7 +6,7 @@ const owContr = new overviewController
 
 const router = Router();
 
-// api/crypto/get
+// api/overview/get
 router.get('/get', auth,
     async (req, res) => {
         try {

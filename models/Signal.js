@@ -13,7 +13,8 @@ const schema = new Schema({
     entryPrice: {type: Number},
     exitPrice: {type: Number},
     profit: {type: Number},
-    telegramMsgId: {type: Number}
+    telegramMsgId: {type: Number},
+    orderId: {type: String},
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 
 schema.plugin(mongooseTimezone, {
