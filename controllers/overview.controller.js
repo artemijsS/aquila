@@ -163,10 +163,79 @@ module.exports = class overview {
                     }
                 }
             },
-            { $sort: {"winRate": -1 } },
+            { $sort: {"winRate": -1, "totalProfit": -1 } },
             { $limit: 5 },
             { $project: { _id:0, crypto: "$_id", totalTrades: 1, totalWinningTrades: 1, totalProfit: 1, winRate: { $round: [{ $multiply: [100, "$winRate"] }, 2] } } }
         ])
+    }
+
+    async getProfitChart(userId, diapason) {
+        const aggregation = [
+            { $match: {userId: mongoose.mongo.ObjectID(userId)} },
+            { $match: {closed: true} },
+        ]
+
+        if (diapason === "day") {
+            aggregation.push({
+                $group: {
+                    _id: {
+                        date: {
+                            $dateToString: {format: "%Y-%m-%d", date: "$created_at"}
+                        }
+                    },
+                    count: { $sum: 1 },
+                    profit: { $sum: "$profit" }
+                }
+            })
+        } else if (diapason === "year") {
+            aggregation.push({ $match: {created_at: { $gte: new Date(Date.now() - (365 * 24 * 60 * 60 * 1000)), $lt: new Date() }} })
+            aggregation.push({
+                $group: {
+                    _id: {
+                        date: {
+                            $month: "$created_at"
+                        }
+                    },
+                    count: { $sum: 1 },
+                    profit: { $sum: "$profit" }
+                }
+            })
+        } else {
+            throw "error"
+        }
+
+        aggregation.push({ $sort: { "_id.date": 1 } },{ $project: { _id: 0, date: "$_id.date", count: 1, profit: { $round: ["$profit", 3] } } })
+
+        let profitChart = await Signal.aggregate(aggregation)
+
+        profitChart = profitChart.map((date, i) => {
+            if (i !== 0)
+                date.profit = Number((profitChart[i-1].profit + date.profit).toFixed(3))
+            if (diapason === "year") {
+                date.date = this.getMonthName(Number(date.date))
+            }
+            return date
+        })
+        return profitChart
+    }
+
+    getMonthName(index) {
+        const month = [
+            null,
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ]
+        return month[index]
     }
 
 };

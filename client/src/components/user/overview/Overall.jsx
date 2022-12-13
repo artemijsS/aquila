@@ -23,11 +23,15 @@ function OverallStats ({ overview }) {
                 </div>
                 <div className="data" title="win rate">
                     <div className="key"><span className={"win"}>&#9824;</span></div>
-                    <div className="value">{overview.winRate}%</div>
+                    <div className="value">{overview.winRate.toFixed(0)}%</div>
                 </div>
                 <div className="data" title="profit">
                     <div className="key"><span className={"win"}>&#36;</span></div>
                     <div className="value">{overview.profit}$</div>
+                </div>
+                <div className="data last" title="average profit per signal">
+                    <div className="key"><span className={"win"}>&#8747;&#36;</span></div>
+                    <div className="value">{(overview.profit/overview.closedSignalsCount).toFixed(3)}$</div>
                 </div>
             </div>
         </div>

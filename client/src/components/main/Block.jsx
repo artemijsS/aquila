@@ -18,7 +18,7 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
     const [search, setSearch] = useState('')
 
     const [newDataCard, setNewDataCard] = useState(false)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     const onCreate = () => {
         setNewDataCard(true)
@@ -118,19 +118,19 @@ function Block ({title, objectForm, urlPath, children, newElement = true, list =
             <Search data={data} onCreate={onCreate} newData={newDataCard} newElement={newElement} update={update} onUpdateData={onUpdateData} onSearchChange={onSearchChange}/>
             <div className={list ? "cards list" : "cards"}>
                 {loading &&
-                <ContentLoader width={"100%"} className={"card"}>
-                    <rect x="0" y="0" rx="10" ry="10" width="5000px" height="100%" />
-                </ContentLoader>
+                    <ContentLoader width={"100%"} className={"card"}>
+                        <rect x="0" y="0" rx="10" ry="10" width="5000px" height="100%" />
+                    </ContentLoader>
                 }
 
-                {newDataCard &&
+                {newDataCard && !loading &&
                     React.cloneElement(children, { data: objectForm, editable: true, close: onCloseCreate, addNew: onAddNew, allInputData: allInputData })
                 }
 
                 {!newDataCard && !loading && data.length === 0 &&
-                <div className="card">
-                    <blockquote className="blockquote"><p>what is not there is not</p></blockquote>
-                </div>
+                    <div className="card">
+                        <blockquote className="blockquote"><p>what is not there is not</p></blockquote>
+                    </div>
                 }
 
                 {pages !== 0 && !newDataCard && !loading &&

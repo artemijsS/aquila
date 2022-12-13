@@ -12,7 +12,7 @@ const User = require('../models/User');
 
 const router = Router();
 
-// api/user/get
+// api/user/admin/get
 router.get('/admin/get', auth, admin,
     async (req, res) => {
         try {
@@ -33,7 +33,7 @@ router.get('/admin/get', auth, admin,
                     {telegram_chatId: {$regex: search, $options: 'i'}},
                     {role: {$regex: search, $options: 'i'}}
                 ] })
-                .select(['telegram_username', 'telegram_chatId', 'role', 'twoFAuthentication', 'disabled', 'notifications'])
+                .select(['telegram_username', 'telegram_chatId', 'role', 'twoFAuthentication', 'disabled', 'notifications', 'last_time_seen'])
                 .limit(size).skip(size * page).sort({
                 telegram_username: "asc"
             })
@@ -116,7 +116,7 @@ router.post('/adminEdit', auth, admin, [
 
             await user.save();
 
-            res.json({user: { telegram_chatId: user.telegram_chatId, telegram_username, role, twoFAuthentication, disabled: user.disabled, notifications: user.notifications}})
+            res.json({user: { last_time_seen: user.last_time_seen, telegram_chatId: user.telegram_chatId, telegram_username, role, twoFAuthentication, disabled: user.disabled, notifications: user.notifications}})
         } catch (e) {
             res.status(500).json({ message: "Error!!!!!!!!!" })
         }

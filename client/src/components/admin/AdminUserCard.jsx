@@ -86,6 +86,10 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
                     <div className="value">{dataForm.telegram_chatId}</div>
                 </div>
                 <div className="data">
+                    <div className="key">Last time login</div>
+                    <div className="value">{new Date(dataForm.last_time_seen).toLocaleString('en-US', {hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric', hour12: false})}</div>
+                </div>
+                <div className="data">
                     <div className="key">Role</div>
                     <div className="value">
                         {edit ?

@@ -32,4 +32,26 @@ router.get('/get', auth,
         }
     })
 
+// api/overview/getProfitChart
+router.get('/getProfitChart', auth,
+    async (req, res) => {
+        try {
+
+            const userId = req.user.userId
+
+            let diapason = "day"
+
+            if (req.query.diapason) {
+                diapason = req.query.diapason
+            }
+
+            const profitChart = await owContr.getProfitChart(userId, diapason)
+
+            res.json(profitChart)
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
 module.exports = router;
