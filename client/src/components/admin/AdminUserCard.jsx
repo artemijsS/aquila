@@ -87,7 +87,7 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
                 </div>
                 <div className="data">
                     <div className="key">Last time login</div>
-                    <div className="value">{new Date(dataForm.last_time_seen).toLocaleString('en-US', {hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric', hour12: false})}</div>
+                    <div className="value">{dataForm.last_time_seen ? new Date(dataForm.last_time_seen).toLocaleString('en-GB', {hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric', hour12: false}) : "Never logged in"}</div>
                 </div>
                 <div className="data">
                     <div className="key">Role</div>

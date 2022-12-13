@@ -121,7 +121,7 @@ bot.on('callback_query', async function onCallbackQuery(callbackQuery) {
     }
 
     if (action === 'CLOSE') {
-        bot.removeReplyListener(data)
+        bot.removeReplyListener(Number(data))
         text = msg.text + "\n\n🔐 <b>Closed</b> 🔐"
     }
 
