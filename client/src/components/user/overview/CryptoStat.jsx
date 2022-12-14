@@ -12,7 +12,7 @@ function CryptoStat ({ crypto, title }) {
                 <div className="data">
                     <div className="key big" title={"crypto"}><span>{crypto._id}</span></div>
                     <div className="value big" title={"total profit"}>{crypto.cryptoProfit}$</div>
-                    <div className="value big" title={"win rate"}>{crypto.winRate}%</div>
+                    <div className="value big" title={"win rate"}>{Math.round(crypto.winRate)}%</div>
                 </div>
             </div>
         </div>

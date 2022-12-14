@@ -228,7 +228,7 @@ code {
   flex-wrap: wrap;
   justify-content: space-between;
   width: 90%;
-  gap: 50px 200px;
+  gap: 50px 100px;
   margin-top: 30px;
   margin-bottom: 30px;
 }
@@ -237,7 +237,7 @@ code {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  /*min-width: 369px;*/
+  min-width: 225px;
   flex: 1;
   min-height: 330px;
   background-color: white;
@@ -311,12 +311,28 @@ code {
   min-height: min-content;
 }
 @media screen and (max-width: 830px) {
+  .block .cards.list .card {
+    font-size: 0.5rem;
+  }
   .block .cards.list .card.editable {
     flex-direction: column;
     gap: 20px;
   }
   .block .cards.list .card.editable .down {
     margin-bottom: 20px;
+  }
+}
+@media screen and (max-width: 450px) {
+  .block .cards.list .card {
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+  }
+  .block .cards.list .card .name {
+    margin: 0 !important;
+  }
+  .block .cards.list .card .down {
+    display: block;
   }
 }
 .block .cards.list .card .name {
@@ -330,6 +346,9 @@ code {
   flex: 1;
 }
 
+.block .cards.list .card.relative {
+  position: relative;
+}
 .block .cards.list .card.signal {
   flex-direction: column;
   position: relative;
@@ -369,7 +388,7 @@ code {
     visibility: hidden;
   }
 }
-.signal .cubes {
+.card .cubes {
   position: absolute;
   right: 2%;
   top: 10px;
@@ -379,37 +398,37 @@ code {
   display: flex;
   gap: 5px;
 }
-.signal .cubes .cube {
+.card .cubes .cube {
   border-radius: 6px;
   padding: 5px 15px;
 }
-.signal .cubes .cube.position {
+.card .cubes .cube.position {
   width: 60px;
   text-align: center;
 }
-.signal .cubes .cube.profit {
+.card .cubes .cube.profit {
   text-align: center;
 }
-.signal .cubes .cube.position.LONG, .signal .cubes .cube.leverage.LONG {
+.card .cubes .cube.position.LONG, .card .cubes .cube.leverage.LONG {
   background-color: rgba(0, 255, 0, 0.5);
 }
-.signal .cubes .cube.position.SHORT, .signal .cubes .cube.leverage.SHORT {
+.card .cubes .cube.position.SHORT, .card .cubes .cube.leverage.SHORT {
   background-color: rgba(255, 0, 0, 0.5);
 }
-.signal .cubes .cube.profit.plus {
+.card .cubes .cube.profit.plus {
   background-color: rgba(0, 255, 0, 0.5);
 }
-.signal .cubes .cube.profit.minus {
+.card .cubes .cube.profit.minus {
   background-color: rgba(255, 0, 0, 0.5);
 }
-.signal .time {
+.card .time {
   position: absolute;
   right: 10px;
   bottom: 5px;
   font-size: 12px;
   color: grey;
 }
-.signal .profitBg {
+.card .profitBg {
   position: absolute;
   height: 100%;
   width: 20%;
@@ -418,23 +437,23 @@ code {
   border-bottom-left-radius: 1.1rem;
   z-index: 0;
 }
-.signal .profitBg.plus {
+.card .profitBg.plus {
   background: linear-gradient(to right, lightgreen, rgba(255, 255, 255, 0));
 }
-.signal .profitBg.minus {
+.card .profitBg.minus {
   background: linear-gradient(to right, lightcoral, rgba(255, 255, 255, 0));
 }
 
 @media screen and (max-width: 900px) {
-  .signal {
+  .card {
     font-size: 0.9em;
   }
-  .signal .cubes {
+  .card .cubes {
     font-size: 0.9em;
     width: 100%;
     justify-content: flex-end;
   }
-  .signal .cubes .cube.profit {
+  .card .cubes .cube.profit {
     position: absolute;
     left: 5%;
     z-index: 2;

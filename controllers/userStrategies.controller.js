@@ -152,11 +152,13 @@ module.exports = class userStrategies {
                     as: "strategy"
                 }
             },
-            {$project: {_id: 1, strategy: "$strategy.data", crypto: 1, leverage: "$strategy.leverage", amount: "$strategy.amount"}},
+            {$project: {_id: 1, strategy: "$strategy.data", crypto: 1, leverage: "$strategy.leverage", amount: "$strategy.amount", workedTimes: "$strategy.workedTimes", percentOfWins: "$strategy.percentOfWins"}},
             {$unwind: "$strategy"},
             {$unwind: "$strategy"},
             {$unwind: "$amount"},
             {$unwind: "$leverage"},
+            {$unwind: "$workedTimes"},
+            {$unwind: "$percentOfWins"},
             {
                 $project: {
                     _id: 1,
@@ -166,6 +168,8 @@ module.exports = class userStrategies {
                     source: "$strategy.source",
                     rating: "$strategy.rating",
                     strategyId: "$strategy._id",
+                    workedTimes: 1,
+                    percentOfWins: 1,
                     leverage: 1,
                     amount: 1,
                     crypto: 1

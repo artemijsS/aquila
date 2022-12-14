@@ -90,7 +90,7 @@ module.exports = class strategies {
                     as: "crypto"
                 }
             },
-            { $project: {_id: 1, urlId: 1, name: 1, description: 1, source: 1, crypto: "$crypto.data"} },
+            { $project: {_id: 1, urlId: 1, name: 1, description: 1, source: 1, workedTimes: 1, percentOfWins: 1, crypto: "$crypto.data"} },
             { $sort: {name: 1} },
             { $skip: size * page },
             { $limit: size }
@@ -132,7 +132,7 @@ module.exports = class strategies {
                     as: "crypto"
                 }
             },
-            { $project: {_id: 1, urlId: 1, name: 1, description: 1, source: 1, crypto: "$crypto.data"} },
+            { $project: {_id: 1, urlId: 1, name: 1, description: 1, source: 1, workedTimes: 1, percentOfWins: 1, crypto: "$crypto.data"} },
             { $sort: {name: 1} },
             { $skip: size * page },
             { $limit: size }
@@ -180,7 +180,7 @@ module.exports = class strategies {
         }
         strategy.workedTimes = strategy.workedTimes + 1
         strategy.profitability = strategy.profitability + allProfit
-        strategy.avgProfitability = Number(strategy.profitability / strategy.workedTimes).toFixed(2)
+        strategy.avgProfitability = Number(Number(strategy.profitability / strategy.workedTimes).toFixed(2))
         if (allProfit > 0) {
             strategy.countOfWins = strategy.countOfWins + 1
         }
@@ -204,7 +204,7 @@ module.exports = class strategies {
         const strategy = await Strategy.findOne({ _id })
 
         strategy.workedTimes = strategy.workedTimes + 1
-        strategy.avgProfitability = Number(strategy.profitability / strategy.workedTimes).toFixed(2)
+        strategy.avgProfitability = Number(Number(strategy.profitability / strategy.workedTimes).toFixed(2))
         if (win) {
             strategy.countOfWins = strategy.countOfWins + 1
         }

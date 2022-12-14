@@ -102,7 +102,11 @@ function StrategyCard ({ data, key = null, own = false, onDeleting = null }) {
     }, [])
 
     return (
-        <div className="card" key={key}>
+        <div className="card relative" key={key}>
+            <div className="cubes">
+                <span className={"cube profit plus"} title={own ? "personal count of triggers" : "global count of triggers"}>{strategy.workedTimes}</span>
+                <span className={"cube leverage LONG"} title={own ? "personal win rate" : "global win rate"}>{strategy.percentOfWins}%</span>
+            </div>
             <div className="name">
                 <h1>{strategy.name}</h1>
             </div>

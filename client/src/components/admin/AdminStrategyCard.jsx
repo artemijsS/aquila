@@ -105,7 +105,11 @@ function AdminStrategyCard ({ data, allInputData, editable = false, close = null
     }
 
     return (
-        <div ref={cardRef} className="card" key={key}>
+        <div ref={cardRef} className="card relative" key={key}>
+            <div className="cubes">
+                <span className={"cube profit plus"} title="global count of triggers">{dataForm.workedTimes}</span>
+                <span className={"cube leverage LONG"} title="global win rate">{dataForm.percentOfWins}%</span>
+            </div>
             <div className="name">
                 <h1>
                     {editable ?
