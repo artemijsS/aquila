@@ -163,4 +163,25 @@ router.post('/actions/get', auth, [
         }
     })
 
+// api/signals/actions/delete
+router.delete('/actions/delete', auth,
+    async (req, res) => {
+        try {
+            const userId = req.user.userId
+
+            let signalId;
+            if (!req.query.signalId) {
+                return res.status(400).json("signalId is mandatory")
+            }
+            signalId = req.query.signalId
+
+            await sigContr.deleteOpenSignal(userId, signalId)
+
+            res.json("Deleted")
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({ message: "Error!!!!!!!!!" })
+        }
+    })
+
 module.exports = router;

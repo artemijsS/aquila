@@ -142,4 +142,12 @@ module.exports = class signal {
         return await Signal.aggregate(aggregation).then(count => count[0] ? count[0].count : 0)
     }
 
+    async deleteOpenSignal(userId, _id) {
+        const signal = await Signal.findOne({ userId, _id, closed: false })
+        if (!signal) {
+            throw "no signal found"
+        }
+        await Signal.deleteOne({ userId, _id, closed: false })
+    }
+
 };

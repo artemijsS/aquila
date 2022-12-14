@@ -368,6 +368,26 @@ code {
 .block .cards.list .card.signal .data h3{
   margin-top: 5px;
 }
+.block .cards.list .card.signal .down {
+  margin-bottom: 5px;
+  justify-content: flex-start;
+  width: 100%;
+  margin-right: 0;
+  margin-left: 60px;
+}
+
+.open-signal-del {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 30px;
+}
+.open-signal-del svg:hover {
+  cursor: pointer;
+  fill: red;
+}
 
 .signal.open {
   background-color: rgba(211, 211, 211, 0.5) !important;
