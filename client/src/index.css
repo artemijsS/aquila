@@ -44,6 +44,12 @@ code {
   }
 }
 
+@media screen and (max-height: 900px) {
+  .login {
+    min-height: 300px;
+  }
+}
+
 .login-logo {
   width: 300px;
   position: absolute;
@@ -569,7 +575,7 @@ code {
 
 /*                  OVERVIEW*/
 .block .cards.min-gap {
-  gap: 50px 70px;
+  gap: 50px 40px;
 }
 .block .cards .card.fixed {
   max-width: 320px;
