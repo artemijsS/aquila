@@ -5,8 +5,9 @@ const Telegram = require('../utils/telegram.util')
 const telegram = new Telegram()
 
 
-module.exports = class strategyCrypto {
+module.exports = class _2FA {
 
+    // checking user 2FA confirm token validity
     async get2FAFields(userId) {
         const user = await User.findOne({ _id: userId }).lean()
         if (!user) {
@@ -29,6 +30,7 @@ module.exports = class strategyCrypto {
         ]
     }
 
+    // generating 2FA code token for user, and sending it to user
     async generateToken(userId) {
         const user = await User.findOne({ _id: userId })
 
@@ -56,6 +58,7 @@ module.exports = class strategyCrypto {
         return true
     }
 
+    // checking 2FA token validity
     async checkToken(userId, code) {
         const user = await User.findOne({ _id: userId });
 
@@ -83,6 +86,7 @@ module.exports = class strategyCrypto {
         return [200, {message: "2FA successfully done"}]
     }
 
+    // generating user 2FA confirm token for 5 minutes
     async generateConfirm(userId) {
         const user = await User.findOne({ _id: userId })
 

@@ -3,9 +3,6 @@ const browser = require('browser-detect');
 const requestIP = require('request-ip');
 const axios = require('axios');
 
-const usrController = require('../controllers/user.controller')
-const usrContr = new usrController
-
 const GEO_URL = 'https://ipgeolocation.abstractapi.com/v1/?api_key=' + process.env.API_GEO;
 
 module.exports = class Bot {
@@ -14,13 +11,14 @@ module.exports = class Bot {
         this.bot = bot
     }
 
-
+    // send message to user
     async sendMessage(chatId, msg) {
         return await this.bot.sendMessage(chatId, msg, {
             "parse_mode": "HTML",
         })
     }
 
+    // send message with reply on different message
     async sendMessageWithReply(chatId, msg, replyMsgId) {
         return await this.bot.sendMessage(chatId, msg, {
             "parse_mode": "HTML",
@@ -28,24 +26,28 @@ module.exports = class Bot {
         })
     }
 
+    // send success message
     async sendSuccess(chatId, msg) {
         const title = "✅✅✅ <b>SUCCESS</b> ✅✅✅\n\n"
         const message = title + "<i>"+msg+"</i>"
         await this.sendMessage(chatId, message)
     }
 
+    // send message with buttons
     async sendWithButton(chatId, msg, buttons) {
         const parse_mode = { "parse_mode": "HTML" }
         const options = {...parse_mode, reply_markup: { inline_keyboard: [ buttons ]}}
         return await this.bot.sendMessage(chatId, msg, options)
     }
 
+    // send notification
     async sendNotification(chatId, msg) {
         const title = "🔸 <b>NOTIFICATION</b> 🔸\n\n"
         const message = title + "<i>"+msg+"</i>"
         await this.sendMessage(chatId, message)
     }
 
+    // send 2FA code
     async send2FACode(chatId, code) {
         const title = "🔑  <b>2FA CODE</b>  🔑\n\n"
         const msg = "<b>"+code+"</b>"
@@ -53,8 +55,10 @@ module.exports = class Bot {
         await this.sendMessage(chatId, message)
     }
 
+    // send login info message
     async sendLoginInfo(chatId, req) {
         const title = "🚪 <b>Someone logged in aquila</b> 🚪\n\n"
+        // creating info about new connection
         const browserInfo = browser(req.headers['user-agent']);
         const ip = requestIP.getClientIp(req);
         const geo = await axios.get(GEO_URL + "&ip_address=" + ip)
@@ -66,6 +70,7 @@ module.exports = class Bot {
         await this.sendWithButton(chatId, message, buttons)
     }
 
+    // send error message
     async sendError(chatId, msg, replyId = false) {
         const title = "⛔️⛔️⛔️ <b>ERROR</b> ⛔️⛔️⛔️\n\n"
         const message = title + "<i>"+msg+"</i>"
@@ -75,6 +80,7 @@ module.exports = class Bot {
             await this.sendMessageWithReply(chatId, message, replyId)
     }
 
+    // send how to change password info
     async sendChangePass(chatId) {
         const title = "❔ <b>How to change Password</b> ❔\n\n"
         const msg = "<b>Use /changePassword command</b>"
@@ -82,6 +88,7 @@ module.exports = class Bot {
         await this.sendMessage(chatId, message)
     }
 
+    // send signal info notification
     async sendSignal(chatId, strategyName, crypto, side, entryPrice, amount, leverage, tp, sl) {
         const title = "💎💎💎 <b>SIGNAL</b> 💎💎💎\n\n"
         const msg = "<b>Strategy - " + strategyName + "\nCrypto - " + crypto + "</b>\n\n"
@@ -94,6 +101,7 @@ module.exports = class Bot {
         return await this.sendMessage(chatId, message)
     }
 
+    // send signal exit notification
     async sendSignalExit(chatId, strategyName, crypto, profit, msgId) {
         const status = profit > 0 ? "✅✅✅" : "❌❌❌"
         const title = `${status} <b>SIGNAL EXIT</b> ${status}\n\n`

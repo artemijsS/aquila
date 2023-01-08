@@ -7,6 +7,7 @@ const sigSocket = new signalSocket()
 
 module.exports = class signal {
 
+    // creating default open signal for user
     async createDefault(userId, strategyName, crypto, exchange, amount, leverage, position, entryPrice, telegramMsgId) {
         const signal = new Signal({
             userId, strategyName, crypto, exchange, amount, leverage, position, entryPrice, telegramMsgId
@@ -16,6 +17,7 @@ module.exports = class signal {
         return true
     }
 
+    // signal creating for TESTING
     async createTestOpenSignal() {
         const signal = {
             userId: "638df2d094a63e8d3f0abfb6",
@@ -38,10 +40,12 @@ module.exports = class signal {
         return true
     }
 
+    // find last user signal by strategyName
     async findLast(userId, strategyName) {
         return Signal.findOne({ userId, strategyName }, {}, { sort: { 'created_at' : -1 } })
     }
 
+    // close user opened signal
     async closeDefault(_id, exitPrice) {
         const signal = await Signal.findOne({ _id })
 
@@ -58,6 +62,7 @@ module.exports = class signal {
         return signal
     }
 
+    // delete user signal because of error
     async deleteSignal(_id, strategyName, chatId, msgReplay) {
         const signal = await Signal.findOne({ _id })
         await Signal.deleteOne({ _id })
@@ -65,6 +70,7 @@ module.exports = class signal {
         sigSocket.deleteSignal(signal.userId, _id)
     }
 
+    // get user signals, by search with pagination and sort
     async get(userId, search, sort, position, cryptos, page, size) {
         const aggregation = [
             {$match: {userId: mongoose.mongo.ObjectID(userId)}},
@@ -126,6 +132,7 @@ module.exports = class signal {
         return Signal.aggregate(aggregation)
     }
 
+    // get user signal count by search and sort
     async getCount(userId, search, position, cryptos) {
 
         const aggregation = [
@@ -142,6 +149,7 @@ module.exports = class signal {
         return await Signal.aggregate(aggregation).then(count => count[0] ? count[0].count : 0)
     }
 
+    // delete user opened signal
     async deleteOpenSignal(userId, _id) {
         const signal = await Signal.findOne({ userId, _id, closed: false })
         if (!signal) {
