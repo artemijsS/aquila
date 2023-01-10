@@ -18,6 +18,8 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
         } else if (event.target.name === "notifications") {
             setDataForm({...dataForm, notifications: !dataForm.notifications})
         } else {
+            console.log(event.target.name)
+            console.log(event.target.value)
             setDataForm({...dataForm, [event.target.name]: event.target.value})
         }
     }
@@ -93,7 +95,7 @@ function AdminUserCard ({ data, onDeleting = null, key = null }) {
                     <div className="key">Role</div>
                     <div className="value">
                         {edit ?
-                            <select name="role" defaultValue={dataForm.role}>
+                            <select name="role" defaultValue={dataForm.role} onChange={changeHandler}>
                                 <option value="admin">admin</option>
                                 <option value="user">user</option>
                             </select>
