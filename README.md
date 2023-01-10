@@ -2,6 +2,13 @@
 
 Aquila is automated cryptocurrency futures trading and its manageable system.
 
+## Prerequisites
+
+```cmd
+node -v
+v16.16.0
+```
+
 ## Installation
 
 Use the package manager [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) to install all dependencies for backend.
